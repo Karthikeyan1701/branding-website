@@ -46,6 +46,23 @@ export const getAllCategories = async (req, res) => {
     }
 };
 
+// Get Single Category by ID
+// GET /api/categories/:id
+
+export const getCategoryById = async (req, res) => {
+    try {
+        const category = await Category.findById(req.params.id);
+
+        if (!category) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+
+        res.status(200).json(category);
+    } catch (error) {
+        res.status(400).json({ message: "Invalid category ID" });
+    }
+};
+
 // Update category
 // PUT /api/categories/:id
 

@@ -19,6 +19,4 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "API is running" });
 });
 
-
-
 export default app;
