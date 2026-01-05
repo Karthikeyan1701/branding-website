@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 
-import categoryRoutes from './routes/category.routes.js';
+import categoryRoutes from "./routes/category.routes.js";
+import subCategoryRoutes from "./routes/subcategory.routes.js";
 
 const app = express();
 
@@ -11,8 +12,11 @@ app.use(express.json());
 app.use(cors());
 app.use(helmet());
 
-// Middlewares for category
+// Middleware for category
 app.use("/api/categories", categoryRoutes);
+
+// Middleware for subcategory
+app.use("/api/subcategories", subCategoryRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
