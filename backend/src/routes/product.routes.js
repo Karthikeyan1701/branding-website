@@ -1,5 +1,5 @@
 import express from 'express';
-
+import { protect } from '../middlewares/auth.middleware.js';
 import {
   createProduct,
   getAllProducts,
@@ -10,10 +10,13 @@ import {
 
 const router = express.Router();
 
-router.post('/', createProduct);
+// Public routes
 router.get('/', getAllProducts);
 router.get('/subcategory/:subcategoryId', getProductsBySubCategory);
-router.put("/:id", updateProduct);
-router.delete('/:id', deleteProduct);
+
+// Protected routes (Admin only creates / deletes / updates product)
+router.post('/', protect, createProduct);
+router.put("/:id", protect, updateProduct);
+router.delete('/:id', protect, deleteProduct);
 
 export default router;

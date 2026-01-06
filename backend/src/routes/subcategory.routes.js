@@ -1,4 +1,5 @@
 import express from 'express';
+import { protect } from '../middlewares/auth.middleware.js';
 import {
   createSubCategory,
   getAllSubCategories,
@@ -9,10 +10,13 @@ import {
 
 const router = express.Router();
 
-router.post("/", createSubCategory);
+// Public routes
 router.get("/", getAllSubCategories);
 router.get("/category/:categoryId", getSubCategoriesByCategory);
-router.put("/:id", updateSubCategory);
-router.delete("/:id", deleteSubCategory);
+
+// Protected routes (Admin only creates / updates / deletes subcategory)
+router.post("/", protect, createSubCategory);
+router.put("/:id", protect, updateSubCategory);
+router.delete("/:id", protect, deleteSubCategory);
 
 export default router;
