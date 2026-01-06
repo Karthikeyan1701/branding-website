@@ -4,6 +4,7 @@ import helmet from "helmet";
 
 import categoryRoutes from "./routes/category.routes.js";
 import subCategoryRoutes from "./routes/subcategory.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 
@@ -17,6 +18,9 @@ app.use("/api/categories", categoryRoutes);
 
 // Middleware for subcategory
 app.use("/api/subcategories", subCategoryRoutes);
+
+// Middleware for products
+app.use("/api/products", productRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
