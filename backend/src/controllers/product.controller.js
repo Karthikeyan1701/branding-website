@@ -4,16 +4,7 @@ import Category from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
 import { buildQueryFeatures } from '../utils/queryFeatures.js';
-
-// Helper function to generate slug
-
-const generateSlug = (slugText) => {
-  return slugText
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '');
-};
+import { generateSlug } from '../utils/slugGenerator.js';
 
 // Create a product inside a subcategory
 // POST /api/products

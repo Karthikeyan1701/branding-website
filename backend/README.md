@@ -8,8 +8,8 @@ Branding Website - Back End Features:
     -> Basic Role Based Access ✅
     -> Input Validation ✅
     -> Centralized error handling ✅
-    -> Data & API Quality (Pagination, Filter and Sort)
-    -> Slug Generation
+    -> Data & API Quality (Pagination, Filter and Sort) (Partially ✅)
+    -> Slug Generation 
     -> External product redirection
     -> Environment based configuration
     -> Complete Postman API Testing

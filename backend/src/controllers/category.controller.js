@@ -2,16 +2,7 @@ import Category from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
 import { buildQueryFeatures } from './../utils/queryFeatures.js';
-
-//Helper function to generate slug
-
-const generateSlug = (slugText) => {
-  return slugText
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)+/g, '');
-};
+import { generateSlug } from '../utils/slugGenerator.js';
 
 // Create New Category
 // POST /api/categories
@@ -144,5 +135,5 @@ export const deleteCategory = asyncHandler(async (req, res) => {
   }
 
   await category.deleteOne();
-  res.status(200).json({ message: 'Category deleted successfully ' });
+  res.status(200).json({ message: 'Category deleted successfully' });
 });
