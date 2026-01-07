@@ -1,6 +1,8 @@
 import Product from '../models/product.model.js';
 import SubCategory from '../models/subcategory.model.js';
 import Category from '../models/category.model.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
 
 // Helper function to generate slug
 
@@ -15,132 +17,161 @@ const generateSlug = (slugText) => {
 // Create a product inside a subcategory
 // POST /api/products
 
-export const createProduct = async (req, res) => {
-  try {
-    const { name, brand, price, categoryId, subcategoryId, externalUrl } =
-      req.body;
+export const createProduct = asyncHandler(async (req, res) => {
+  const { name, brand, price, categoryId, subcategoryId, externalUrl } =
+    req.body;
 
-    // Basic validation
-    if (!name || !price || !categoryId || !subcategoryId || !externalUrl) {
-      return res.status(400).json({
-        message: 'Required fields are missing',
-      });
-    }
+  // Basic validation
 
-    // Check category exists
-    const categoryExists = await Category.findById(categoryId);
-    if (!categoryExists) {
-      return res.status(404).json({ message: 'Category not found' });
-    }
+  const missing = requiredInputFields(
+    ['name', 'price', 'categoryId', 'subcategoryId', 'externalUrl'],
+    req.body
+  );
 
-    // Check subcategory exists
-    const subCategoryExists = await SubCategory.findById(subcategoryId);
-    if (!subCategoryExists) {
-      return res.status(404).json({ message: 'Subcategory not found' });
-    }
-
-    // Prevent duplicate product in same subcategory
-    const existingProduct = await Product.findOne({
-      name: name(trim),
-      subcategory: subcategoryId,
-    });
-
-    if (existingProduct) {
-      return res.status(409).json({
-        message: 'Product already exists in this subcategory',
-      });
-    }
-
-    // Create product
-    const product = await Product.create({
-      name,
-      slug: generateSlug(name),
-      brand,
-      price,
-      category: categoryId,
-      subcategory: subcategoryId,
-      externalUrl,
-    });
-
-    res.status(201).json(product);
-  } catch (error) {
-    res.status(500).jon({
-      message: error.message,
+  if (missing.length) {
+    return res.status(400).json({
+      message: `Missing fields: ${missing.join(', ')}`,
     });
   }
-};
+
+  // Validate ID Formats
+  if (!isValidObjectId(categoryId)) {
+    return res.status(400).json({ message: 'Invalid category ID' });
+  }
+
+  if (!isValidObjectId(subcategoryId)) {
+    return res.status(400).json({ message: 'Invalid subcategory ID' });
+  }
+
+  // Check category exists
+  const categoryExists = await Category.findById(categoryId);
+  if (!categoryExists) {
+    return res.status(404).json({ message: 'Category not found' });
+  }
+
+  // Check subcategory exists
+  const subCategoryExists = await SubCategory.findById(subcategoryId);
+  if (!subCategoryExists) {
+    return res.status(404).json({ message: 'Subcategory not found' });
+  }
+
+  // Prevent duplicate product in same subcategory
+  const existingProduct = await Product.findOne({
+    name: name.trim(),
+    subcategory: subcategoryId,
+  });
+
+  if (existingProduct) {
+    return res.status(409).json({
+      message: 'Product already exists in this subcategory',
+    });
+  }
+
+  // Create product
+  const product = await Product.create({
+    name,
+    slug: generateSlug(name),
+    brand,
+    price,
+    category: categoryId,
+    subcategory: subcategoryId,
+    externalUrl,
+  });
+  res.status(201).json(product);
+});
 
 // Get all products
 // GET /api/products
 
-export const getAllProducts = async (req, res) => {
-  try {
-    const products = (
-      await Product.find()
-        .populate('category', 'name slug')
-        .populate('subcategory', 'name slug')
-    ).sort({ createdAt: -1 });
+export const getAllProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .populate('category', 'name slug')
+    .populate('subcategory', 'name slug')
+    .sort({ createdAt: -1 });
 
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  res.status(200).json(products);
+});
 
 // Get products by subcategory
 // GET /api/products/subcategory/:subcategoryId
-export const getProductsBySubCategory = async (req, res) => {
-  try {
-    const products = await Product.find({
-        subcategory: req.params.subcategoryId
+export const getProductsBySubCategory = asyncHandler(async (req, res) => {
+  const { subcategoryId } = req.params;
+
+  // Validate ID Format
+  if (!isValidObjectId(subcategoryId)) {
+    return res.status(400).json({
+      message: 'Invalid subcategory ID',
     });
-  } catch (error) {
-    res.status(400).json({ message: "Invalid subcategory ID" });
-  } 
-};
+  }
+
+  // Check subcategory exists
+  const subCategory = await SubCategory.findById(subcategoryId);
+  if (!subCategory) {
+    return res.status(404).json({
+      message: 'Subcategory not found',
+    });
+  }
+
+  const products = await Product.find({
+    subcategory: subcategoryId,
+  });
+
+  res.status(200).json(products);
+});
 
 // Update a product
 // PUT /api/products/:id
 
-export const updateProduct = async (req, res) => {
-    try {
-        const { name, brand, price, isActive } = req.body;
+export const updateProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, brand, price, isActive, externalUrl } = req.body;
 
-        const product = await Product.findById(req.params.id);
+  // Validate product ID
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({
+      message: 'Invalid product ID',
+    });
+  }
 
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }
+  const product = await Product.findById(id);
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
 
-        if (name) {
-            product.name = name;
-            product.slug = generateSlug(name);
-        }
+  if (name) {
+    product.name = name;
+    product.slug = generateSlug(name);
+  }
 
-        if (brand) product.brand = brand;
-        if (price !== undefined) product.price = price;
-        if (typeof isActive === "boolean") product.isActive = isActive;
+  if (brand) product.brand = brand;
+  if (price !== undefined) product.price = price;
+  if (typeof isActive === 'boolean') product.isActive = isActive;
+  if (externalUrl) product.externalUrl = externalUrl;
 
-        const updated = await product.save();
-        res.status(200).json(updated);
-    } catch (error) {
-        res.status(400).json({ message: "Invalid product ID" });
-    }
-};
+  const updatedProduct = await product.save();
+  res.status(200).json(updatedProduct);
+});
 
 // Delete a product
 // DELETE /api/products/:id
-export const deleteProduct = async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id);
 
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }
+export const deleteProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-        await product.deleteOne();
-        res.status(200).json({ message: "Product deleted successfully" });
-    } catch (error) {
-        res.status(400).json({ message: "Invalid product ID" });
-    }
-};
+  // Validate product ID
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({
+      message: 'Invalid product ID'
+    });
+  }
+
+  // Delete product
+  const product = await Product.findById(id);
+
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
+
+  await product.deleteOne();
+  res.status(200).json({ message: 'Product deleted successfully' });
+});
