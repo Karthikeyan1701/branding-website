@@ -5,10 +5,10 @@ Branding Website - Back End Features:
         Subcategory CRUD Operations ✅
         Product CRUD Operations ✅
     -> JWT Auth for Admin route protection ✅
-    -> Role Based Access Control
-    -> Data & API Quality (Pagination, Filter and Sort)
+    -> Basic Role Based Access ✅
     -> Input Validation
     -> Centralized error handling
+    -> Data & API Quality (Pagination, Filter and Sort)
     -> Slug Generation
     -> External product redirection
     -> Environment based configuration

@@ -7,6 +7,7 @@ import subCategoryRoutes from "./routes/subcategory.routes.js";
 import productRoutes from "./routes/product.routes.js";
 
 import authRoutes from "./routes/auth.routes.js"
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 
@@ -27,5 +28,8 @@ app.use("/api/auth", authRoutes);
 app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "API is running" });
 });
+
+// Middleware for centralized error handling
+app.use(errorHandler);
 
 export default app;
