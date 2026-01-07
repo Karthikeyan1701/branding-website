@@ -2,6 +2,7 @@ import SubCategory from '../models/subcategory.model.js';
 import Category from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from './../utils/validators';
+import { buildQueryFeatures } from '../utils/queryFeatures.js';
 
 // Helper function to generate slug
 
@@ -65,10 +66,33 @@ export const createSubCategory = asyncHandler(async (req, res) => {
 // GET /api/subcategories
 
 export const getAllSubCategories = asyncHandler(async (req, res) => {
-  const subCategories = await SubCategory.find()
+  const { page, limit, skip, sortBy, order } = buildQueryFeatures(req.query);
+
+  const filter = {};
+
+  if (req.query.search) {
+    filter.name = { $regex: req.query.search, $options: 'i' };
+  }
+
+  if (req.query.isActive !== undefined) {
+    filter.isActive = req.query.isActive === 'true';
+  }
+
+  const total = await SubCategory.countDocuments(filter);
+
+  const subCategories = await SubCategory.find(filter)
     .populate('category', 'name slug')
-    .sort({ createdAt: -1 });
-  res.status(200).json(subCategories);
+    .sort({ [sortBy]: order })
+    .skip(skip)
+    .limit(limit);
+
+  res.status(200).json({
+    total,
+    page,
+    limit,
+    results: subCategories.length,
+    data: subCategories,
+  });
 });
 
 // Get subcategories by category ID
@@ -136,27 +160,26 @@ export const updateSubCategory = asyncHandler(async (req, res) => {
 // DELETE /api/subcategories/:id
 
 export const deleteSubCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-    const { id } = req.params;
-
-    if(!isValidObjectId(id)) {
-        return res.status(400).json({
-            message: "Invalid subcategory ID"
-        });
-    }
-
-    // Find subcategory
-    const subCategory = await SubCategory.findById(id);
-
-    if (!subCategory) {
-      return res.status(404).json({
-        message: 'Subcategory not found',
-      });
-    }
-
-    await subCategory.deleteOne();
-
-    res.status(200).json({
-      message: 'Subcategory deleted successfully',
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({
+      message: 'Invalid subcategory ID',
     });
+  }
+
+  // Find subcategory
+  const subCategory = await SubCategory.findById(id);
+
+  if (!subCategory) {
+    return res.status(404).json({
+      message: 'Subcategory not found',
+    });
+  }
+
+  await subCategory.deleteOne();
+
+  res.status(200).json({
+    message: 'Subcategory deleted successfully',
+  });
 });

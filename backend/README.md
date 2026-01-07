@@ -6,8 +6,8 @@ Branding Website - Back End Features:
         Product CRUD Operations ✅
     -> JWT Auth for Admin route protection ✅
     -> Basic Role Based Access ✅
-    -> Input Validation
-    -> Centralized error handling
+    -> Input Validation ✅
+    -> Centralized error handling ✅
     -> Data & API Quality (Pagination, Filter and Sort)
     -> Slug Generation
     -> External product redirection

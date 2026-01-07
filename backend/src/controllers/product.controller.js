@@ -3,6 +3,7 @@ import SubCategory from '../models/subcategory.model.js';
 import Category from '../models/category.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
+import { buildQueryFeatures } from '../utils/queryFeatures.js';
 
 // Helper function to generate slug
 
@@ -84,12 +85,34 @@ export const createProduct = asyncHandler(async (req, res) => {
 // GET /api/products
 
 export const getAllProducts = asyncHandler(async (req, res) => {
-  const products = await Product.find()
+  const { page, limit, skip, sortBy, order } = buildQueryFeatures(req.query);
+
+  const filter = {};
+
+  if (req.query.search) {
+    filter.name = { $regex: req.query.search, $options: 'i' };
+  }
+
+  if (req.query.isActive !== undefined) {
+    filter.isActive = req.query.isActive === 'true';
+  }
+
+  const total = await Product.countDocuments(filter);
+
+  const products = await Product.find(filter)
     .populate('category', 'name slug')
     .populate('subcategory', 'name slug')
-    .sort({ createdAt: -1 });
+    .sort({ [sortBy]: order })
+    .skip(skip)
+    .limit(limit);
 
-  res.status(200).json(products);
+  res.status(200).json({
+    total,
+    page,
+    limit,
+    results: products.length,
+    data: products,
+  });
 });
 
 // Get products by subcategory
@@ -161,7 +184,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   // Validate product ID
   if (!isValidObjectId(id)) {
     return res.status(400).json({
-      message: 'Invalid product ID'
+      message: 'Invalid product ID',
     });
   }
 
