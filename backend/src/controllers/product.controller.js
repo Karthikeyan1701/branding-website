@@ -110,6 +110,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
 // GET /api/products/subcategory/:subcategoryId
 export const getProductsBySubCategory = asyncHandler(async (req, res) => {
   const { subcategoryId } = req.params;
+  const { page, limit, skip, sortBy, order } = buildQueryFeatures(req.query);
 
   // Validate ID Format
   if (!isValidObjectId(subcategoryId)) {
@@ -119,18 +120,40 @@ export const getProductsBySubCategory = asyncHandler(async (req, res) => {
   }
 
   // Check subcategory exists
-  const subCategory = await SubCategory.findById(subcategoryId);
-  if (!subCategory) {
+  const subCategoryExists = await SubCategory.findById(subcategoryId);
+  if (!subCategoryExists) {
     return res.status(404).json({
       message: 'Subcategory not found',
     });
   }
 
-  const products = await Product.find({
-    subcategory: subcategoryId,
-  });
+  // Build filter
+  const filter = { subcategory: subcategoryId };
 
-  res.status(200).json(products);
+  if (req.query.search) {
+    filter.name = { $regex: req.query.search, $options: 'i' };
+  }
+
+  if (req.query.isActive !== undefined) {
+    filter.isActive = req.query.isActive === 'true';
+  }
+
+  const total = await Product.countDocuments(filter);
+
+  const products = await Product.find(filter)
+    .populate('category', 'name slug')
+    .populate('subcategory', 'name slug')
+    .sort({ [sortBy]: order })
+    .skip(skip)
+    .limit(limit);
+
+  res.status(200).json({
+    total,
+    page,
+    limit,
+    results: products.length,
+    data: products
+  });
 });
 
 // Update a product

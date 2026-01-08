@@ -91,26 +91,46 @@ export const getAllSubCategories = asyncHandler(async (req, res) => {
 
 export const getSubCategoriesByCategory = asyncHandler(async (req, res) => {
   const { categoryId } = req.params;
+  const { page, limit, skip, sortBy, order } = buildQueryFeatures(req.query);
 
-  //Validate ID Format
+  //Validate Category ID Format
   if (!isValidObjectId(categoryId)) {
     return res.status(400).json({
       message: 'Invalid category ID',
     });
   }
 
-  // Check if category exists
+  // Check category exists
   const categoryExists = await Category.findById(categoryId);
   if (!categoryExists) {
     return res.status(404).json({ message: 'Category not found' });
   }
 
-  // Fetch subcategories by category ID
-  const subCategories = await SubCategory.find({
-    category: categoryId,
-  });
+  const filter = { category: categoryId };
 
-  res.status(200).json(subCategories);
+  if (req.query.search) {
+    filter.name = { $regex: req.query.search, $options: "i" };
+  }
+
+  if (req.query.isActive !== undefined) {
+    filter.isActive = req.query.isActive === "true";
+  }
+
+  const total = await SubCategory.countDocuments(filter);
+
+  const subCategories = await SubCategory.find(filter)
+  .populate("category", "name slug")
+  .sort({ [sortBy]: order })
+  .skip(skip)
+  .limit(limit);
+
+  res.status(200).json({
+    total,
+    page,
+    limit,
+    results: subCategories.length,
+    data: subCategories,
+  });
 });
 
 // Update a subcategory
