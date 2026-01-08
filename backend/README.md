@@ -1,5 +1,6 @@
 Branding Website - Back End Features:
     -> Express Server & MongoDB Setup ✅
+    -> Environment based configuration ✅
     -> REST API Architecture
         Category CRUD Operations ✅
         Subcategory CRUD Operations ✅
@@ -10,8 +11,7 @@ Branding Website - Back End Features:
     -> Centralized error handling ✅
     -> Data & API Quality (Pagination, Filter and Sort) ✅
     -> Slug Generation ✅
-    -> External product redirection
-    -> Environment based configuration
+    -> External product redirection ✅
     -> Postman Manual API Testing
     -> Back End Automation Testing
     -> Logging & Monitoring
