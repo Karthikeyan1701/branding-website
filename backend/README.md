@@ -8,12 +8,15 @@ Branding Website - Back End Features:
     -> Basic Role Based Access ✅
     -> Input Validation ✅
     -> Centralized error handling ✅
-    -> Data & API Quality (Pagination, Filter and Sort) (Partially ✅)
-    -> Slug Generation 
+    -> Data & API Quality (Pagination, Filter and Sort) ✅
+    -> Slug Generation ✅
     -> External product redirection
     -> Environment based configuration
-    -> Complete Postman API Testing
+    -> Postman Manual API Testing
     -> Back End Automation Testing
+    -> Logging & Monitoring
+    -> Security Hardening
+    -> Documentation work
 
 Category URL:
     1. POST http://localhost:4000/api/categories

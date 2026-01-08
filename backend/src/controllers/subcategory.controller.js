@@ -33,7 +33,7 @@ export const createSubCategory = asyncHandler(async (req, res) => {
 
   // Prevent duplicate subcategory within same category
   const existingSubCategory = await SubCategory.findOne({
-    name: name.trim(),
+    name: name.toString().trim(),
     category: categoryId,
   });
 
@@ -109,20 +109,20 @@ export const getSubCategoriesByCategory = asyncHandler(async (req, res) => {
   const filter = { category: categoryId };
 
   if (req.query.search) {
-    filter.name = { $regex: req.query.search, $options: "i" };
+    filter.name = { $regex: req.query.search, $options: 'i' };
   }
 
   if (req.query.isActive !== undefined) {
-    filter.isActive = req.query.isActive === "true";
+    filter.isActive = req.query.isActive === 'true';
   }
 
   const total = await SubCategory.countDocuments(filter);
 
   const subCategories = await SubCategory.find(filter)
-  .populate("category", "name slug")
-  .sort({ [sortBy]: order })
-  .skip(skip)
-  .limit(limit);
+    .populate('category', 'name slug')
+    .sort({ [sortBy]: order })
+    .skip(skip)
+    .limit(limit);
 
   res.status(200).json({
     total,

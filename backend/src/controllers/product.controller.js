@@ -49,7 +49,7 @@ export const createProduct = asyncHandler(async (req, res) => {
 
   // Prevent duplicate product in same subcategory
   const existingProduct = await Product.findOne({
-    name: name.trim(),
+    name: name.toString().trim(),
     subcategory: subcategoryId,
   });
 

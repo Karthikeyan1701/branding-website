@@ -17,7 +17,7 @@ export const createCategory = asyncHandler(async (req, res) => {
   }
 
   const existingCategory = await Category.findOne({
-    name: req.body.name.trim(),
+    name: req.body.name.toString().trim(),
   });
   if (existingCategory) {
     return res.status(409).json({ message: 'Category already exists' });
@@ -117,7 +117,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
 });
 
 // Delete category
-// DELETE //api/categories/:id
+// DELETE /api/categories/:id
 
 export const deleteCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
