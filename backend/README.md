@@ -1,6 +1,6 @@
 Branding Website - Back End Features:
     -> Express Server & MongoDB Setup ✅
-    -> Environment based configuration ✅
+    -> Environment variable based configuration ✅
     -> REST API Architecture
         Category CRUD Operations ✅
         Subcategory CRUD Operations ✅

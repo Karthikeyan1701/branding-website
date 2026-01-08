@@ -152,8 +152,39 @@ export const getProductsBySubCategory = asyncHandler(async (req, res) => {
     page,
     limit,
     results: products.length,
-    data: products
+    data: products,
   });
+});
+
+// Redirect to external product link
+// GET /api/products/redirect/:id
+
+export const redirectToExternalUrl = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Validate product ID format
+  if (!isValidObjectId(id)) {
+    return res.status(400).json({
+      message: 'Invalid product ID',
+    });
+  }
+
+  const product = await Product.findById(id);
+
+  if (!product) {
+    return res.status(404).json({
+      message: 'Product not found',
+    });
+  }
+
+  if (!product.externalUrl) {
+    return res.status(400).json({
+      message: 'External link not available for this product',
+    });
+  }
+
+  // Redirect to trusted external product link
+  return res.redirect(product.externalUrl);
 });
 
 // Update a product
