@@ -1,3 +1,8 @@
 export default function Services() {
-  return <h1>Services Page</h1>;
+  return (
+    <div>
+      <h1>Services</h1>
+      <p>We provide branding and digital solutions.</p>
+    </div>
+  );
 }
