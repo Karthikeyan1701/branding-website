@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthProvider.jsx';
 
 export default function AdminLogin() {
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -16,8 +19,11 @@ export default function AdminLogin() {
         password,
       });
 
-      setMessage("Login successful!");
-      console.log("Response:", res.data);
+      // save token in context
+      login(res.data.token);
+
+      setMessage('Login successful!');
+      console.log('Response:', res.data);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Login failed');
     }
@@ -41,7 +47,11 @@ export default function AdminLogin() {
         <div>
           <label>Password</label>
           <br />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
 
         <button type="submit">Login</button>
