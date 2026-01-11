@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../api/axios';
-import { useAuth } from '../context/AuthProvider.jsx';
+import { useAuth } from '../context/useAuth.js';
 
 export default function AdminLogin() {
   const { login } = useAuth();
