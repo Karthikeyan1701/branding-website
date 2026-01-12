@@ -1,8 +1,12 @@
+import { useAuth } from "../context/useAuth";
+
 export default function Dashboard() {
+    const { logout } = useAuth();
+
     return (
         <div>
             <h2>Admin Dashboard</h2>
-            <p>You are logged in as admin.</p>
+            <button onClick={logout}>Logout</button>
         </div>
     );
 }

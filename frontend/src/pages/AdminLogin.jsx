@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import api from '../api/axios';
 import { useAuth } from '../context/useAuth.js';
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminLogin() {
-  const { login } = useAuth();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ export default function AdminLogin() {
       login(res.data.token);
 
       setMessage('Login successful!');
-      console.log('Response:', res.data);
+      navigate('/dashboard');
     } catch (error) {
       setMessage(error.response?.data?.message || 'Login failed');
     }
