@@ -1,0 +1,104 @@
+/* eslint-disable-next-line no-unused-vars */
+import { motion, AnimatePresence } from 'motion/react';
+
+import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
+import api from '../../api/axios';
+
+export default function CategoryFormDialog({
+  open,
+  onClose,
+  onSuccess,
+  editData,
+}) {
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (editData) {
+      setName(editData.name);
+    } else {
+      setName('');
+    }
+  }, [editData]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      if (editData) {
+        await api.put(`/categories/${editData._id}`, { name });
+      } else {
+        await api.post('/categories', { name });
+      }
+
+      onSuccess();
+      onClose();
+    } catch {
+      setError('Failed to save category');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+
+          {/* Dialog */}
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+              <button className="absolute top-3 right-3" onClick={onClose}>
+                <X size={18} />
+              </button>
+
+              <h3>{editData ? 'Edit Category' : 'Add Category'}</h3>
+
+              {error && <p>{error}</p>}
+
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Category name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+
+                <div style={{ marginTop: '1rem' }}>
+                  <button type="submit" disabled={loading}>
+                    {loading ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    style={{ marginLeft: '8px' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
