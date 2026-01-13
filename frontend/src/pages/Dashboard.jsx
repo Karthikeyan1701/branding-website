@@ -4,6 +4,7 @@ import api from '../api/axios';
 
 import CategoryFormDialog from '../components/admin/CategoryFormDialog';
 import SubcategoryFormDialog from '../components/admin/SubcategoryFormDialog';
+import ProductFormDialog from '../components/admin/ProductFormDialog';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -18,10 +19,16 @@ export default function Dashboard() {
   const [openSubDialog, setOpenSubDialog] = useState(false);
   const [editSubcategory, setEditSubcategory] = useState(null);
 
+  const [products, setProducts] = useState([]);
+  const [openProdDialog, setOpenProdDialog] = useState(false);
+  const [editProduct, setEditProduct] = useState(null);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
   // Fetch Categories
   useEffect(() => {
     fetchCategories();
     fetchSubcategories();
+    fetchProducts();
   }, []);
 
   const fetchCategories = async () => {
@@ -47,6 +54,19 @@ export default function Dashboard() {
       alert('Failed to load subcategories');
     } finally {
       setLoadingSubs(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const res = await api.get('/products');
+      setProducts(res.data);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to load products');
+    } finally {
+      setLoadingProducts(false);
     }
   };
 
@@ -77,6 +97,21 @@ export default function Dashboard() {
     } catch (error) {
       console.error(error);
       alert('Failed to delete subcategory');
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    const confirmDeleteProd = window.confirm(
+      'Are you sure you want to delete this product?'
+    );
+    if (!confirmDeleteProd) return;
+
+    try {
+      await api.delete(`/products/${id}`);
+      fetchProducts();
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete product');
     }
   };
 
@@ -169,6 +204,47 @@ export default function Dashboard() {
         )}
       </section>
 
+      {/* -------- Product Section -------- */}
+      <section style={{ marginTop: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <h3>Products</h3>
+          <button
+            onClick={() => {
+              setEditProduct(null);
+              setOpenProdDialog(true);
+            }}
+          >
+            + Add Product
+          </button>
+        </div>
+
+        {loadingProducts ? (
+          <p>Loading products...</p>
+        ) : products.length === 0 ? (
+          <p>No products found.</p>
+        ) : (
+          <ul>
+            {products.map((prod) => (
+              <li key={prod._id} style={{ marginBottom: '8px' }}>
+                <strong>{prod.name}</strong>{' '}
+                <strong>{prod.category?.name}</strong>{' '}
+                <button
+                  onClick={() => {
+                    setEditProduct(prod);
+                    setOpenProdDialog(true);
+                  }}
+                >
+                  Edit
+                </button>{' '}
+                <button onClick={() => handleDeleteProduct(prod._id)}>
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       {/* -------- Category Dialog -------- */}
       <CategoryFormDialog 
         open={openDialog}
@@ -183,6 +259,14 @@ export default function Dashboard() {
         onClose={() => setOpenSubDialog(false)}
         editData={editSubcategory}
         onSuccess={fetchSubcategories}
+      />
+
+      {/* -------- Product Dialog -------- */}
+      <ProductFormDialog 
+        open={openProdDialog}
+        onClose={() => setOpenProdDialog(false)}
+        editData={editProduct}
+        onSuccess={fetchProducts}
       />
     </div>
   );

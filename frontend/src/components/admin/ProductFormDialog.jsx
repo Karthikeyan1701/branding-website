@@ -1,0 +1,192 @@
+/* eslint-disable-next-line no-unused-vars */
+import { motion, AnimatePresence } from 'motion/react';
+
+import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
+import api from '../../api/axios';
+
+export default function ProductFormDialog({
+  open,
+  onClose,
+  onSuccess,
+  editData,
+}) {
+  const [name, setName] = useState('');
+  const [brand, setBrand] = useState('');
+  const [price, setPrice] = useState('');
+  const [externalUrl, setExternalUrl] = useState('');
+
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+
+  const [categoryId, setCategoryId] = useState('');
+  const [subcategoryId, setSubcategoryId] = useState('');
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    api.get('/categories').then((res) => setCategories(res.data));
+  }, []);
+
+  useEffect(() => {
+    if (!categoryId) return;
+    api
+      .get(`/subcategories/category/${categoryId}`)
+      .then((res) => setSubcategories(res.data));
+  }, [categoryId]);
+
+  useEffect(() => {
+    if (editData) {
+      setName(editData.name);
+      setBrand(editData.brand || '');
+      setPrice(editData.price);
+      setExternalUrl(editData.externalUrl || '');
+      setCategoryId(editData.category?._id || '');
+      setSubcategoryId(editData.subcategory?._id || '');
+    } else {
+      setName('');
+      setBrand('');
+      setPrice('');
+      setExternalUrl('');
+      setCategoryId('');
+      setSubcategoryId('');
+      setSubcategories([]);
+    }
+  }, [editData]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const payload = {
+        name,
+        brand,
+        price,
+        externalUrl,
+        categoryId,
+        subcategoryId,
+      };
+
+      if (editData) {
+        await api.put(`/products/${editData._id}`, { payload });
+      } else {
+        await api.post('/products', { payload });
+      }
+
+      onSuccess();
+      onClose();
+    } catch {
+      setError('Failed to save product');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="fixed inset-0 bg-black/40 z-40"
+            onClick={onClose}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+
+          {/* Dialog */}
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+              <button className="absolute top-3 right-3" onClick={onClose}>
+                <X size={18} />
+              </button>
+
+              <h3>{editData ? 'Edit Product' : 'Add Product'}</h3>
+
+              {error && <p>{error}</p>}
+
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Product name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+
+                <input
+                  placeholder="Brand"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                />
+
+                <input
+                  type="number"
+                  placeholder="Price"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  reqired
+                />
+
+                <input
+                  placeholder="External product URL"
+                  value={externalUrl}
+                  onChange={(e) => setExternalUrl(e.target.value)}
+                  required
+                />
+
+                <select
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={subcategoryId}
+                  onChange={(e) => setSubcategoryId(e.target.value)}
+                  required
+                >
+                  <option value="">Select Subcategory</option>
+                  {subcategories.map((subcategory) => (
+                    <option key={subcategory._id} value={subcategory._id}>
+                      {subcategory.name}
+                    </option>
+                  ))}
+                </select>
+
+                <div style={{ marginTop: '1rem' }}>
+                  <button type="submit" disabled={loading}>
+                    {loading ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    style={{ marginLeft: '8px' }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
