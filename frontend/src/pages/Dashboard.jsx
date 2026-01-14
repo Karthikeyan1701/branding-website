@@ -24,6 +24,9 @@ export default function Dashboard() {
   const [editProduct, setEditProduct] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+
   // Fetch Categories
   useEffect(() => {
     fetchCategories();
@@ -70,49 +73,64 @@ export default function Dashboard() {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this category?'
+  const handleDeleteCategory = async (id) => {
+    const confirmDeleteCategory = window.confirm(
+      'Are you sure you want to delete this category?\nThis action cannot be undone.'
     );
-    if (!confirmDelete) return;
+    if (!confirmDeleteCategory) return;
 
     try {
       await api.delete(`/categories/${id}`);
       fetchCategories();
+      showSuccessMsg("Category deleted successfully");
     } catch (error) {
       console.error(error);
-      alert('Failed to delete category');
+      showErrorMsg('Failed to delete category');
     }
   };
 
-  const handleDeleteSub = async (id) => {
-    const confirmDeleteSub = window.confirm(
-      'Are you sure you want to delete this subcategory?'
+  const handleDeleteSubcategory = async (id) => {
+    const confirmDeleteSubcategory = window.confirm(
+      'Are you sure you want to delete this subcategory?\nThis action cannot be undone.'
     );
-    if (!confirmDeleteSub) return;
+    if (!confirmDeleteSubcategory) return;
 
     try {
       await api.delete(`/subcategories/${id}`);
       fetchSubcategories();
+      showSuccessMsg("Subcategory deleted successfully");
     } catch (error) {
       console.error(error);
-      alert('Failed to delete subcategory');
+      showErrorMsg('Failed to delete subcategory');
     }
   };
 
   const handleDeleteProduct = async (id) => {
-    const confirmDeleteProd = window.confirm(
-      'Are you sure you want to delete this product?'
+    const confirmDeleteProduct = window.confirm(
+      'Are you sure you want to delete this product?\nThis action cannot be undone.'
     );
-    if (!confirmDeleteProd) return;
+    if (!confirmDeleteProduct) return;
 
     try {
       await api.delete(`/products/${id}`);
       fetchProducts();
+      showSuccessMsg("Product added successfully");
     } catch (error) {
       console.error(error);
-      alert('Failed to delete product');
+      showErrorMsg('Failed to delete product');
     }
+  };
+
+  const showSuccessMsg = (msg) => {
+    setSuccessMsg(msg);
+    setErrorMsg("");
+    setTimeout(() => setSuccessMsg(""), 2000)
+  };
+
+  const showErrorMsg = (msg) => {
+    setErrorMsg(msg);
+    setSuccessMsg("");
+    setTimeout(() => setErrorMsg(""), 3000);
   };
 
   return (
@@ -120,6 +138,19 @@ export default function Dashboard() {
       {/* -------- Header -------- */}
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <h2>Admin Dashboard</h2>
+
+        {successMsg && (
+          <p style={{ color: "green", marginBottom: "10px" }}>
+            {successMsg}
+          </p>
+        )}
+
+        {errorMsg && (
+          <p style={{ color: "red", marginBottom: "10px" }}>
+            {errorMsg}
+          </p>
+        )}
+
         <button onClick={logout}>Logout</button>
       </div>
 
@@ -140,7 +171,7 @@ export default function Dashboard() {
         {loading ? (
           <p>Loading categories...</p>
         ) : categories.length === 0 ? (
-          <p>No categories found.</p>
+          <p>No categories yet. Click "Add Category" to create your first one.</p>
         ) : (
           <ul>
             {categories.map((category) => (
@@ -154,7 +185,7 @@ export default function Dashboard() {
                 >
                   Edit
                 </button>{' '}
-                <button onClick={() => handleDelete(category._id)}>
+                <button onClick={() => handleDeleteCategory(category._id)}>
                   Delete
                 </button>
               </li>
@@ -180,7 +211,7 @@ export default function Dashboard() {
         {loadingSubs ? (
           <p>Loading subcategories...</p>
         ) : subcategories.length === 0 ? (
-          <p>No subcategories found.</p>
+          <p>No subcategories yet. Add one new subcategory under a category.</p>
         ) : (
           <ul>
             {subcategories.map((subcategory) => (
@@ -195,7 +226,7 @@ export default function Dashboard() {
                 >
                   Edit
                 </button>{' '}
-                <button onClick={() => handleDeleteSub(subcategory._id)}>
+                <button onClick={() => handleDeleteSubcategory(subcategory._id)}>
                   Delete
                 </button>
               </li>
@@ -221,7 +252,7 @@ export default function Dashboard() {
         {loadingProducts ? (
           <p>Loading products...</p>
         ) : products.length === 0 ? (
-          <p>No products found.</p>
+          <p>No products yet. Add your first product.</p>
         ) : (
           <ul>
             {products.map((prod) => (
@@ -250,7 +281,10 @@ export default function Dashboard() {
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         editData={editCategory}
-        onSuccess={fetchCategories}
+        onSuccess={() => {
+          fetchCategories();
+          showSuccessMsg("Category saved successfully");
+        }}
       />
 
       {/* -------- Subcategory Dialog -------- */}
@@ -258,7 +292,10 @@ export default function Dashboard() {
         open={openSubDialog}
         onClose={() => setOpenSubDialog(false)}
         editData={editSubcategory}
-        onSuccess={fetchSubcategories}
+        onSuccess={() => {
+          fetchSubcategories();
+          showSuccessMsg("Subcategory saved successfully");
+        }}
       />
 
       {/* -------- Product Dialog -------- */}
@@ -266,7 +303,10 @@ export default function Dashboard() {
         open={openProdDialog}
         onClose={() => setOpenProdDialog(false)}
         editData={editProduct}
-        onSuccess={fetchProducts}
+        onSuccess={() => {
+          fetchProducts();
+          showSuccessMsg("Product saved successfully");
+        }}
       />
     </div>
   );

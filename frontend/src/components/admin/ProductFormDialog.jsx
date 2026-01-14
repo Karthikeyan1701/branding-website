@@ -26,6 +26,12 @@ export default function ProductFormDialog({
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (open) {
+      setError('');
+    }
+  }, [open]);
+
+  useEffect(() => {
     api.get('/categories').then((res) => setCategories(res.data));
   }, []);
 
@@ -71,14 +77,15 @@ export default function ProductFormDialog({
       };
 
       if (editData) {
-        await api.put(`/products/${editData._id}`, { payload });
+        await api.put(`/products/${editData._id}`, payload);
       } else {
-        await api.post('/products', { payload });
+        await api.post('/products', payload);
       }
 
       onSuccess();
       onClose();
-    } catch {
+    } catch (err) {
+      console.error(err);
       setError('Failed to save product');
     } finally {
       setLoading(false);
@@ -92,7 +99,7 @@ export default function ProductFormDialog({
           {/* Backdrop */}
           <motion.div
             className="fixed inset-0 bg-black/40 z-40"
-            onClick={onClose}
+            onClick={!loading ? onClose : undefined}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -106,13 +113,17 @@ export default function ProductFormDialog({
             exit={{ opacity: 0, scale: 0.9 }}
           >
             <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
-              <button className="absolute top-3 right-3" onClick={onClose}>
+              <button
+                className="absolute top-3 right-3"
+                onClick={!loading ? onClose : undefined}
+                disabled={loading}
+              >
                 <X size={18} />
               </button>
 
               <h3>{editData ? 'Edit Product' : 'Add Product'}</h3>
 
-              {error && <p>{error}</p>}
+              {error && <p style={{ color: 'red' }}>{error}</p>}
 
               <form onSubmit={handleSubmit}>
                 <input
@@ -134,7 +145,7 @@ export default function ProductFormDialog({
                   placeholder="Price"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  reqired
+                  required
                 />
 
                 <input
@@ -176,7 +187,8 @@ export default function ProductFormDialog({
                   </button>
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={!loading ? onClose : undefined}
+                    disabled={loading}
                     style={{ marginLeft: '8px' }}
                   >
                     Cancel
