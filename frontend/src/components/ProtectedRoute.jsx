@@ -2,11 +2,13 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
 export default function ProtectedRoute({ children }) {
-    const { token } = useAuth();
+  const { user, loading } = useAuth();
 
-    if (!token) {
-        return <Navigate to='/admin' replace />
-    }
+  if (loading) return null;
 
-    return children;
+  if (!user) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return children;
 }
