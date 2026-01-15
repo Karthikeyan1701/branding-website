@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../context/useAuth';
 import api from '../api/axios';
 
@@ -11,7 +11,7 @@ export default function Dashboard() {
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [openDialog, setOpenDialog] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
 
   const [subcategories, setSubcategories] = useState([]);
@@ -24,54 +24,54 @@ export default function Dashboard() {
   const [editProduct, setEditProduct] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Fetch Categories
   useEffect(() => {
     fetchCategories();
     fetchSubcategories();
     fetchProducts();
-  }, []);
+  }, [fetchCategories, fetchSubcategories, fetchProducts]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get('/categories');
       setCategories(res.data);
     } catch (error) {
       console.error(error);
-      alert('Failed to load categories');
+      showErrorMsg('Failed to load categories');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchSubcategories = async () => {
+  const fetchSubcategories = useCallback(async () => {
     try {
       setLoadingSubs(true);
       const res = await api.get('/subcategories');
       setSubcategories(res.data);
     } catch (error) {
       console.error(error);
-      alert('Failed to load subcategories');
+      showErrorMsg('Failed to load subcategories');
     } finally {
       setLoadingSubs(false);
     }
-  };
+  }, []);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoadingProducts(true);
       const res = await api.get('/products');
       setProducts(res.data);
     } catch (error) {
       console.error(error);
-      alert('Failed to load products');
+      showErrorMsg('Failed to load products');
     } finally {
       setLoadingProducts(false);
     }
-  };
+  }, []);
 
   const handleDeleteCategory = async (id) => {
     const confirmDeleteCategory = window.confirm(
@@ -82,7 +82,7 @@ export default function Dashboard() {
     try {
       await api.delete(`/categories/${id}`);
       fetchCategories();
-      showSuccessMsg("Category deleted successfully");
+      showSuccessMsg('Category deleted successfully');
     } catch (error) {
       console.error(error);
       showErrorMsg('Failed to delete category');
@@ -98,7 +98,7 @@ export default function Dashboard() {
     try {
       await api.delete(`/subcategories/${id}`);
       fetchSubcategories();
-      showSuccessMsg("Subcategory deleted successfully");
+      showSuccessMsg('Subcategory deleted successfully');
     } catch (error) {
       console.error(error);
       showErrorMsg('Failed to delete subcategory');
@@ -114,7 +114,7 @@ export default function Dashboard() {
     try {
       await api.delete(`/products/${id}`);
       fetchProducts();
-      showSuccessMsg("Product added successfully");
+      showSuccessMsg('Product added successfully');
     } catch (error) {
       console.error(error);
       showErrorMsg('Failed to delete product');
@@ -123,42 +123,42 @@ export default function Dashboard() {
 
   const showSuccessMsg = (msg) => {
     setSuccessMsg(msg);
-    setErrorMsg("");
-    setTimeout(() => setSuccessMsg(""), 2000)
+    setErrorMsg('');
+    setTimeout(() => setSuccessMsg(''), 2000);
   };
 
   const showErrorMsg = (msg) => {
     setErrorMsg(msg);
-    setSuccessMsg("");
-    setTimeout(() => setErrorMsg(""), 3000);
+    setSuccessMsg('');
+    setTimeout(() => setErrorMsg(''), 3000);
   };
 
   return (
-    <div>
+    <div className="space-y-8">
       {/* -------- Header -------- */}
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <h2>Admin Dashboard</h2>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+        <h2 className="text-xl font-semibold">Admin Dashboard</h2>
 
-        {successMsg && (
-          <p style={{ color: "green", marginBottom: "10px" }}>
-            {successMsg}
-          </p>
-        )}
+        <div className="flex flex-col gap-1">
+          {successMsg && <p className="text-green-600">{successMsg}</p>}
 
-        {errorMsg && (
-          <p style={{ color: "red", marginBottom: "10px" }}>
-            {errorMsg}
-          </p>
-        )}
+          {errorMsg && <p className="text-red-600">{errorMsg}</p>}
+        </div>
 
-        <button onClick={logout}>Logout</button>
+        <button
+          onClick={logout}
+          className="border px-3 py-1 rounded hover:bg-gray-100 w-fit"
+        >
+          Logout
+        </button>
       </div>
 
       {/* -------- Category Section -------- */}
-      <section style={{ marginTop: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>Categories</h3>
+      <section className="space-y-3">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold">Categories</h3>
           <button
+            className="border px-3 py-1 rounded"
             onClick={() => {
               setEditCategory(null);
               setOpenDialog(true);
@@ -169,15 +169,18 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <p>Loading categories...</p>
+          <p className="text-gray-500">Loading categories...</p>
         ) : categories.length === 0 ? (
-          <p>No categories yet. Click "Add Category" to create your first one.</p>
+          <p className="text-gray-500">
+            No categories yet. Click "Add Category" to create your first one.
+          </p>
         ) : (
-          <ul>
+          <ul className="space-y-2">
             {categories.map((category) => (
-              <li key={category._id} style={{ marginBottom: '8px' }}>
+              <li key={category._id} className="flex items-center gap-3">
                 <strong>{category.name}</strong>{' '}
                 <button
+                  className="text-blue-600 text-sm"
                   onClick={() => {
                     setEditCategory(category);
                     setOpenDialog(true);
@@ -185,7 +188,10 @@ export default function Dashboard() {
                 >
                   Edit
                 </button>{' '}
-                <button onClick={() => handleDeleteCategory(category._id)}>
+                <button
+                  className="text-red-600 text-sm"
+                  onClick={() => handleDeleteCategory(category._id)}
+                >
                   Delete
                 </button>
               </li>
@@ -195,10 +201,11 @@ export default function Dashboard() {
       </section>
 
       {/* -------- Subcategory Section -------- */}
-      <section style={{ marginTop: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>Subcategories</h3>
+      <section className="space-y-3">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold">Subcategories</h3>
           <button
+            className="border px-3 py-1 rounded"
             onClick={() => {
               setEditSubcategory(null);
               setOpenSubDialog(true);
@@ -209,24 +216,32 @@ export default function Dashboard() {
         </div>
 
         {loadingSubs ? (
-          <p>Loading subcategories...</p>
+          <p className="text-gray-500">Loading subcategories...</p>
         ) : subcategories.length === 0 ? (
-          <p>No subcategories yet. Add one new subcategory under a category.</p>
+          <p className="text-gray-500">
+            No subcategories yet. Add one new subcategory under a category.
+          </p>
         ) : (
-          <ul>
+          <ul className="space-y-2">
             {subcategories.map((subcategory) => (
-              <li key={subcategory._id} style={{ marginBottom: '8px' }}>
-                <strong>{subcategory.name}</strong>{' '}
-                <strong>{subcategory.category?.name}</strong>{' '}
+              <li key={subcategory._id} className="flex items-center gap-3">
+                <strong>{subcategory.name}</strong>
+                <span className="text-sm text-gray-500">
+                  {subcategory.category?.name}
+                </span>
                 <button
+                  className="text-blue-600 text-sm"
                   onClick={() => {
                     setEditSubcategory(subcategory);
                     setOpenSubDialog(true);
                   }}
                 >
                   Edit
-                </button>{' '}
-                <button onClick={() => handleDeleteSubcategory(subcategory._id)}>
+                </button>
+                <button
+                  className="text-red-600 text-sm"
+                  onClick={() => handleDeleteSubcategory(subcategory._id)}
+                >
                   Delete
                 </button>
               </li>
@@ -236,10 +251,11 @@ export default function Dashboard() {
       </section>
 
       {/* -------- Product Section -------- */}
-      <section style={{ marginTop: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h3>Products</h3>
+      <section className="space-y-3">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold">Products</h3>
           <button
+            className="border px-3 py-1 rounded"
             onClick={() => {
               setEditProduct(null);
               setOpenProdDialog(true);
@@ -250,24 +266,27 @@ export default function Dashboard() {
         </div>
 
         {loadingProducts ? (
-          <p>Loading products...</p>
+          <p className="text-gray-500">Loading products...</p>
         ) : products.length === 0 ? (
-          <p>No products yet. Add your first product.</p>
+          <p className="text-gray-500">No products yet. Add your first product.</p>
         ) : (
-          <ul>
+          <ul className="space-y-2">
             {products.map((prod) => (
-              <li key={prod._id} style={{ marginBottom: '8px' }}>
-                <strong>{prod.name}</strong>{' '}
-                <strong>{prod.category?.name}</strong>{' '}
+              <li key={prod._id} className="flex items-center gap-3">
+                <strong>{prod.name}</strong>
+                <span className="text-sm text-gray-500">{prod.category?.name}</span>
                 <button
+                className="text-blue-600 text-sm"
                   onClick={() => {
                     setEditProduct(prod);
                     setOpenProdDialog(true);
                   }}
                 >
                   Edit
-                </button>{' '}
-                <button onClick={() => handleDeleteProduct(prod._id)}>
+                </button>
+                <button
+                className="text-red-600 text-sm"
+                 onClick={() => handleDeleteProduct(prod._id)}>
                   Delete
                 </button>
               </li>
@@ -277,35 +296,35 @@ export default function Dashboard() {
       </section>
 
       {/* -------- Category Dialog -------- */}
-      <CategoryFormDialog 
+      <CategoryFormDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         editData={editCategory}
         onSuccess={() => {
           fetchCategories();
-          showSuccessMsg("Category saved successfully");
+          showSuccessMsg('Category saved successfully');
         }}
       />
 
       {/* -------- Subcategory Dialog -------- */}
-      <SubcategoryFormDialog 
+      <SubcategoryFormDialog
         open={openSubDialog}
         onClose={() => setOpenSubDialog(false)}
         editData={editSubcategory}
         onSuccess={() => {
           fetchSubcategories();
-          showSuccessMsg("Subcategory saved successfully");
+          showSuccessMsg('Subcategory saved successfully');
         }}
       />
 
       {/* -------- Product Dialog -------- */}
-      <ProductFormDialog 
+      <ProductFormDialog
         open={openProdDialog}
         onClose={() => setOpenProdDialog(false)}
         editData={editProduct}
         onSuccess={() => {
           fetchProducts();
-          showSuccessMsg("Product saved successfully");
+          showSuccessMsg('Product saved successfully');
         }}
       />
     </div>

@@ -22,11 +22,7 @@ export default function CategoryFormDialog({
   }, [open]);
 
   useEffect(() => {
-    if (editData) {
-      setName(editData.name);
-    } else {
-      setName('');
-    }
+      setName(editData ? editData.name : '');
   }, [editData]);
 
   const handleSubmit = async (e) => {
@@ -73,35 +69,37 @@ export default function CategoryFormDialog({
           >
             <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
               <button
-                className="absolute top-3 right-3"
+                className="absolute top-3 right-3 disabled:opacity-60"
                 onClick={!loading ? onClose : undefined}
                 disabled={loading}
               >
                 <X size={18} />
               </button>
 
-              <h3>{editData ? 'Edit Category' : 'Add Category'}</h3>
+              <h3 className="text-lg font-semibold mb-3"
+              >{editData ? 'Edit Category' : 'Add Category'}</h3>
 
-              {error && <p style={{ color: 'red' }}>{error}</p>}
+              {error && <p className="text-red-600 mb-2">{error}</p>}
 
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} className="space-y-3">
                 <input
                   type="text"
                   placeholder="Category name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  className="w-full border rounded px-3 py-2"
                 />
 
-                <div style={{ marginTop: '1rem' }}>
-                  <button type="submit" disabled={loading}>
+                <div className="flex justify-end gap-2 pt-4">
+                  <button type="submit" disabled={loading} className="bg-black text-white px-4 py-2 rounded disabled:opacity-60">
                     {loading ? 'Saving...' : 'Save'}
                   </button>
                   <button
                     type="button"
                     onClick={!loading ? onClose : undefined}
                     disabled={loading}
-                    style={{ marginLeft: '8px' }}
+                    className="border px-4 py-2 rounded disabled:opacity-60"
                   >
                     Cancel
                   </button>
