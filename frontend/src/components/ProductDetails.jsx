@@ -33,7 +33,7 @@ export default function ProductDetails({ open, onClose, product }) {
           >
             <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
               <button
-                className="absolute top-3 right-3"
+                className="absolute top-3 right-3 text-gray-500 hover:text-black"
                 onClick={onClose}
                 aria-label="Close"
               >
@@ -41,20 +41,36 @@ export default function ProductDetails({ open, onClose, product }) {
               </button>
 
               {!product ? (
-                <p>Loading...</p>
+                <p className="text-gray-500">Loading product details...</p>
               ) : (
                 <>
                   <h3 className="text-lg font-semibold">{product.name}</h3>
-                  <p className="mt-2">Brand: {product.brand}</p>
-                  <p className="mt-1">Price: ₹{product.price}</p>
 
-                  <div className="mt-4 flex gap-2">
+                  <div className="text-sm text-gray-600 space-y-1">
+                    {product.brand && <p>Brand: {product.brand}</p>}
+                    <p>Price: ₹{product.price}</p>
+                  </div>
+
+                  <div className="h-px bg-gray-200" />
+
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={() => window.open(product.externalUrl, '_blank')}
+                      className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
                     >
-                      Buy from trusted site
+                      Buy from trusted partner site
                     </button>
-                    <button onClick={onClose}>Close</button>
+
+                    <p className="text-xs text-gray-500">
+                      You will be redirected to a secure external website.
+                    </p>
+
+                    <button
+                      onClick={onClose}
+                      className="border px-4 py-2 rounded hover:bg-gray-50"
+                    >
+                      Close
+                    </button>
                   </div>
                 </>
               )}

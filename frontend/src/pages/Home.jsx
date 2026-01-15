@@ -82,39 +82,68 @@ export default function Home() {
   }, [selectedSubcategoryId]);
 
   return (
-    <div>
-      <h2>Browse Products</h2>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-xl font-semibold">Explore Our Products</h1>
+        <p className="text-sm text-gray-500">
+          Browse categories, choose a subcategory, and view products.
+        </p>
+      </div>
 
-      {error && <p>{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
 
       {/* CATEGORIES UI */}
-      <h3>Categories</h3>
-      {loadingCategories ? (
-        <p>Loading Categories...</p>
-      ) : (
-        <ul>
-          {categories.map((category) => (
-            <li key={category._id}>
-              <button onClick={() => setSelectedCategoryId(category._id)}>
-                {category.name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <section className="space-y-3">
+        <h3 className="font-semibold">Categories</h3>
+        {loadingCategories ? (
+          <p className="text-gray-500">Loading Categories...</p>
+        ) : categories.length === 0 ? (
+          <p className="text-gray-500 text-sm">
+            No categories available at the moment.
+          </p>
+        ) : (
+          <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {categories.map((category) => (
+              <li key={category._id}>
+                <button
+                  onClick={() => setSelectedCategoryId(category._id)}
+                  className={`w-full border rounded px-3 py-2 text-left hover:bg-gray-50 
+                    ${
+                      selectedCategoryId === category._id
+                        ? 'bg-gray-100 font-medium'
+                        : ''
+                    }`}
+                >
+                  {category.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {/* SUBCATEGORIES UI */}
       {selectedCategoryId && (
-        <>
-          <h3>Subcategories</h3>
+        <section className="space-y-3">
+          <h3 className="font-semibold">Subcategories</h3>
+
           {loadingSubcategories ? (
-            <p>Loading subcategories...</p>
+            <p className="text-gray-500">Loading subcategories...</p>
+          ) : subcategories.length === 0 ? (
+            <p className="text-gray-500 text-sm">
+              No subcategories found for this category.
+            </p>
           ) : (
-            <ul>
+            <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {subcategories.map((subcategory) => (
                 <li key={subcategory._id}>
                   <button
                     onClick={() => setSelectedSubcategoryId(subcategory._id)}
+                    className={`w-full border rounded px-3 py-2 text-left hover:bg-gray-50 ${
+                      selectedSubcategoryId === subcategory._id
+                        ? 'bg-gray-100 font-medium'
+                        : ''
+                    }`}
                   >
                     {subcategory.name}
                   </button>
@@ -122,37 +151,52 @@ export default function Home() {
               ))}
             </ul>
           )}
-        </>
+        </section>
       )}
 
       {/* PRODUCTS UI */}
       {selectedSubcategoryId && (
-        <>
-          <h3>Products</h3>
+        <section className="space-y-3">
+          <h3 className="font-semibold">Products</h3>
+
           {loadingProducts ? (
-            <p>Loading products...</p>
+            <p className="text-gray-500">Loading products...</p>
+          ) : products.length === 0 ? (
+            <p className="text-gray-500 text-sm">
+              No products found in this subcategory.
+            </p>
           ) : (
-            <ul>
+            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {products.map((product) => (
-                <li key={product._id}>
-                  <strong>{product.name}</strong>
-                  <h3>₹{product.price}</h3>
-                  <br />
-                  <button onClick={() => {
-                    setActiveProduct(product);
-                    setOpenDialog(true);
-                  }}>
+                <li
+                  key={product._id}
+                  className="border rounded p-4 space-y-2 hover:shadow-sm"
+                >
+                  <div>
+                    <strong className="block">{product.name}</strong>
+                    <span className="text-gray-600 text-sm">
+                      ₹{product.price}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setActiveProduct(product);
+                      setOpenDialog(true);
+                    }}
+                    className="text-blue-600 text-sm hover:underline"
+                  >
                     View Details
                   </button>
                 </li>
               ))}
             </ul>
           )}
-        </>
+        </section>
       )}
 
       {/* DIALOG BOX UI */}
-      <ProductDetails 
+      <ProductDetails
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         product={activeProduct}
