@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/useAuth';
-import api from '../api/axios';
+import useDashboardData from '../hooks/useDashboardData';
 
 import CategoryFormDialog from '../components/admin/CategoryFormDialog';
 import SubcategoryFormDialog from '../components/admin/SubcategoryFormDialog';
@@ -9,129 +9,30 @@ import ProductFormDialog from '../components/admin/ProductFormDialog';
 export default function Dashboard() {
   const { logout } = useAuth();
 
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    categories,
+    subcategories,
+    products,
+    loading,
+    successMsg,
+    errorMsg,
+    handleDeleteCategory,
+    handleDeleteSubcategory,
+    handleDeleteProduct,
+    fetchCategories,
+    fetchSubcategories,
+    fetchProducts,
+    showSuccessMsg
+  } = useDashboardData();
+
   const [openDialog, setOpenDialog] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
 
-  const [subcategories, setSubcategories] = useState([]);
-  const [loadingSubs, setLoadingSubs] = useState(true);
   const [openSubDialog, setOpenSubDialog] = useState(false);
   const [editSubcategory, setEditSubcategory] = useState(null);
 
-  const [products, setProducts] = useState([]);
   const [openProdDialog, setOpenProdDialog] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
-  const [loadingProducts, setLoadingProducts] = useState(true);
-
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-
-  // Fetch Categories
-  useEffect(() => {
-    fetchCategories();
-    fetchSubcategories();
-    fetchProducts();
-  }, [fetchCategories, fetchSubcategories, fetchProducts]);
-
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await api.get('/categories');
-      setCategories(res.data);
-    } catch (error) {
-      console.error(error);
-      showErrorMsg('Failed to load categories');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchSubcategories = useCallback(async () => {
-    try {
-      setLoadingSubs(true);
-      const res = await api.get('/subcategories');
-      setSubcategories(res.data);
-    } catch (error) {
-      console.error(error);
-      showErrorMsg('Failed to load subcategories');
-    } finally {
-      setLoadingSubs(false);
-    }
-  }, []);
-
-  const fetchProducts = useCallback(async () => {
-    try {
-      setLoadingProducts(true);
-      const res = await api.get('/products');
-      setProducts(res.data);
-    } catch (error) {
-      console.error(error);
-      showErrorMsg('Failed to load products');
-    } finally {
-      setLoadingProducts(false);
-    }
-  }, []);
-
-  const handleDeleteCategory = async (id) => {
-    const confirmDeleteCategory = window.confirm(
-      'Are you sure you want to delete this category?\nThis action cannot be undone.'
-    );
-    if (!confirmDeleteCategory) return;
-
-    try {
-      await api.delete(`/categories/${id}`);
-      fetchCategories();
-      showSuccessMsg('Category deleted successfully');
-    } catch (error) {
-      console.error(error);
-      showErrorMsg('Failed to delete category');
-    }
-  };
-
-  const handleDeleteSubcategory = async (id) => {
-    const confirmDeleteSubcategory = window.confirm(
-      'Are you sure you want to delete this subcategory?\nThis action cannot be undone.'
-    );
-    if (!confirmDeleteSubcategory) return;
-
-    try {
-      await api.delete(`/subcategories/${id}`);
-      fetchSubcategories();
-      showSuccessMsg('Subcategory deleted successfully');
-    } catch (error) {
-      console.error(error);
-      showErrorMsg('Failed to delete subcategory');
-    }
-  };
-
-  const handleDeleteProduct = async (id) => {
-    const confirmDeleteProduct = window.confirm(
-      'Are you sure you want to delete this product?\nThis action cannot be undone.'
-    );
-    if (!confirmDeleteProduct) return;
-
-    try {
-      await api.delete(`/products/${id}`);
-      fetchProducts();
-      showSuccessMsg('Product added successfully');
-    } catch (error) {
-      console.error(error);
-      showErrorMsg('Failed to delete product');
-    }
-  };
-
-  const showSuccessMsg = (msg) => {
-    setSuccessMsg(msg);
-    setErrorMsg('');
-    setTimeout(() => setSuccessMsg(''), 2000);
-  };
-
-  const showErrorMsg = (msg) => {
-    setErrorMsg(msg);
-    setSuccessMsg('');
-    setTimeout(() => setErrorMsg(''), 3000);
-  };
 
   return (
     <div className="space-y-8">
@@ -168,7 +69,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {loading ? (
+        {loading.categories ? (
           <p className="text-gray-500">Loading categories...</p>
         ) : categories.length === 0 ? (
           <p className="text-gray-500">
@@ -215,7 +116,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {loadingSubs ? (
+        {loading.subcategories ? (
           <p className="text-gray-500">Loading subcategories...</p>
         ) : subcategories.length === 0 ? (
           <p className="text-gray-500">
@@ -265,7 +166,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {loadingProducts ? (
+        {loading.products ? (
           <p className="text-gray-500">Loading products...</p>
         ) : products.length === 0 ? (
           <p className="text-gray-500">No products yet. Add your first product.</p>
