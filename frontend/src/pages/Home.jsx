@@ -1,85 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ProductDetails from '../components/ProductDetails';
-import api from './../api/axios';
+import useHomeData from '../hooks/useHomeData';
 
 export default function Home() {
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [products, setProducts] = useState([]);
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
-
-  const [loadingCategories, setLoadingCategories] = useState(true);
-  const [loadingSubcategories, setLoadingSubcategories] = useState(false);
-  const [loadingProducts, setLoadingProducts] = useState(false);
+  const {
+    categories,
+    subcategories,
+    products,
+    loading,
+    error,
+    selectedCategoryId,
+    setSelectedCategoryId,
+    selectedSubcategoryId,
+    setSelectedSubcategoryId,
+  } = useHomeData();
 
   const [openDialog, setOpenDialog] = useState(false);
   const [activeProduct, setActiveProduct] = useState(null);
-
-  const [error, setError] = useState('');
-
-  // Load categories on page load
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await api.get('/categories');
-        setCategories(res.data);
-      } catch {
-        setError('Failed to load categories');
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    fetchCategories();
-  }, []);
-
-  // Load subcategories when category is selected
-
-  useEffect(() => {
-    if (!selectedCategoryId) return;
-
-    const fetchSubcategories = async () => {
-      try {
-        setLoadingSubcategories(true);
-        const res = await api.get(
-          `/subcategories/category/${selectedCategoryId}`
-        );
-        setSubcategories(res.data);
-        setProducts([]);
-        setSelectedSubcategoryId(null);
-      } catch {
-        setError('Failed to load subcategories');
-      } finally {
-        setLoadingSubcategories(false);
-      }
-    };
-
-    fetchSubcategories();
-  }, [selectedCategoryId]);
-
-  // Load products when subcategory is selected
-  useEffect(() => {
-    if (!selectedSubcategoryId) return;
-
-    const fetchProducts = async () => {
-      try {
-        setLoadingProducts(true);
-        const res = await api.get(
-          `/products/subcategory/${selectedSubcategoryId}`
-        );
-        setProducts(res.data);
-      } catch {
-        setError('Failed to load products');
-      } finally {
-        setLoadingProducts(false);
-      }
-    };
-
-    fetchProducts();
-  }, [selectedSubcategoryId]);
 
   return (
     <div className="space-y-8">
@@ -95,7 +33,7 @@ export default function Home() {
       {/* CATEGORIES UI */}
       <section className="space-y-3">
         <h3 className="font-semibold">Categories</h3>
-        {loadingCategories ? (
+        {loading.categories ? (
           <p className="text-gray-500">Loading Categories...</p>
         ) : categories.length === 0 ? (
           <p className="text-gray-500 text-sm">
@@ -127,7 +65,7 @@ export default function Home() {
         <section className="space-y-3">
           <h3 className="font-semibold">Subcategories</h3>
 
-          {loadingSubcategories ? (
+          {loading.subcategories ? (
             <p className="text-gray-500">Loading subcategories...</p>
           ) : subcategories.length === 0 ? (
             <p className="text-gray-500 text-sm">
@@ -159,7 +97,7 @@ export default function Home() {
         <section className="space-y-3">
           <h3 className="font-semibold">Products</h3>
 
-          {loadingProducts ? (
+          {loading.products ? (
             <p className="text-gray-500">Loading products...</p>
           ) : products.length === 0 ? (
             <p className="text-gray-500 text-sm">
