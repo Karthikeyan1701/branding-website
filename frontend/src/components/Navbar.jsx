@@ -7,7 +7,7 @@ export default function Navbar() {
 
   const linkClass = ({
     isActive,
-  }) => `block px-3 py-2 rounded text-sm font-medium transition
+  }) => `block w-full px-4 py-3 rounded text-sm font-medium transition
     ${isActive ? 'bg-gray-100 text-black' : 'text-gray-600 hover:bg-gray-50'}`;
 
   return (
@@ -33,15 +33,16 @@ export default function Navbar() {
         </nav>
 
         {/* Protected admin navigation */}
-        <NavLink to="/admin" className="hidden md:block">
+        <NavLink to="/admin" className="hidden md:block px-3 py-2 text-sm font-medium text-gray-600">
           Admin
         </NavLink>
 
         {/* Mobile toggle menu button */}
         <button
-          className="md:hidden"
-          onClick={() => setOpen(!open)}
+          className="md:hidden p-2 rounded hover:bg-gray-100"
+          onClick={() => setOpen((prev) => !prev)}
           aria-label="Toggle menu"
+          aria-expanded={open}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -49,7 +50,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t bg-white px-4 py-3 space-y-2">
+        <div className="md:hidden border-t bg-white px-4 py-4 space-y-2">
           <NavLink to="/" className={linkClass} onClick={() => setOpen(false)}>
             Home
           </NavLink>

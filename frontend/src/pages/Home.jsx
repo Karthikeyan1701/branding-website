@@ -20,10 +20,11 @@ export default function Home() {
   const [activeProduct, setActiveProduct] = useState(null);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold">Explore Our Products</h1>
-        <p className="text-sm text-gray-500">
+    <div className="space-y-10 px-4 md:px-6 lg:px-8">
+      {/* Page Header */}
+      <div className="space-y-1">
+        <h1 className="text-xl md:text-2xl font-semibold">Explore Our Products</h1>
+        <p className="text-sm text-gray-500 max-w-2xl">
           Browse categories, choose a subcategory, and view products.
         </p>
       </div>
@@ -31,8 +32,8 @@ export default function Home() {
       {error && <p className="text-red-600 text-sm">{error}</p>}
 
       {/* CATEGORIES UI */}
-      <section className="space-y-3">
-        <h3 className="font-semibold">Categories</h3>
+      <section className="space-y-4">
+        <h3 className="font-semibold text-lg">Categories</h3>
         {loading.categories ? (
           <p className="text-gray-500">Loading Categories...</p>
         ) : categories.length === 0 ? (
@@ -40,12 +41,12 @@ export default function Home() {
             No categories available at the moment.
           </p>
         ) : (
-          <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {categories.map((category) => (
               <li key={category._id}>
                 <button
                   onClick={() => setSelectedCategoryId(category._id)}
-                  className={`w-full border rounded px-3 py-2 text-left hover:bg-gray-50 
+                  className={`w-full border rounded-lg px-4 py-3 text-left text-sm transition hover:bg-gray-50 
                     ${
                       selectedCategoryId === category._id
                         ? 'bg-gray-100 font-medium'
@@ -62,8 +63,8 @@ export default function Home() {
 
       {/* SUBCATEGORIES UI */}
       {selectedCategoryId && (
-        <section className="space-y-3">
-          <h3 className="font-semibold">Subcategories</h3>
+        <section className="space-y-4">
+          <h3 className="font-semibold text-lg">Subcategories</h3>
 
           {loading.subcategories ? (
             <p className="text-gray-500">Loading subcategories...</p>
@@ -72,12 +73,12 @@ export default function Home() {
               No subcategories found for this category.
             </p>
           ) : (
-            <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {subcategories.map((subcategory) => (
                 <li key={subcategory._id}>
                   <button
                     onClick={() => setSelectedSubcategoryId(subcategory._id)}
-                    className={`w-full border rounded px-3 py-2 text-left hover:bg-gray-50 ${
+                    className={`w-full border rounded px-4 py-3 text-left text-sm transition hover:bg-gray-50 ${
                       selectedSubcategoryId === subcategory._id
                         ? 'bg-gray-100 font-medium'
                         : ''
@@ -94,8 +95,8 @@ export default function Home() {
 
       {/* PRODUCTS UI */}
       {selectedSubcategoryId && (
-        <section className="space-y-3">
-          <h3 className="font-semibold">Products</h3>
+        <section className="space-y-4">
+          <h3 className="font-semibold text-lg">Products</h3>
 
           {loading.products ? (
             <p className="text-gray-500">Loading products...</p>
@@ -104,14 +105,14 @@ export default function Home() {
               No products found in this subcategory.
             </p>
           ) : (
-            <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {products.map((product) => (
                 <li
                   key={product._id}
-                  className="border rounded p-4 space-y-2 hover:shadow-sm"
+                  className="border rounded-lg p-4 space-y-3 transition hover:shadow-sm"
                 >
                   <div>
-                    <strong className="block">{product.name}</strong>
+                    <strong className="block text-sm">{product.name}</strong>
                     <span className="text-gray-600 text-sm">
                       ₹{product.price}
                     </span>
