@@ -22,7 +22,7 @@ export default function Dashboard() {
     fetchCategories,
     fetchSubcategories,
     fetchProducts,
-    showSuccessMsg
+    showSuccessMsg,
   } = useDashboardData();
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -35,31 +35,31 @@ export default function Dashboard() {
   const [editProduct, setEditProduct] = useState(null);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 px-4 md:px-6 lg:px-8">
       {/* -------- Header -------- */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <h2 className="text-xl font-semibold">Admin Dashboard</h2>
 
-        <div className="flex flex-col gap-1">
-          {successMsg && <p className="text-green-600">{successMsg}</p>}
+        <div className="space-y-1">
+          {successMsg && <p className="text-green-600 text-sm">{successMsg}</p>}
 
-          {errorMsg && <p className="text-red-600">{errorMsg}</p>}
+          {errorMsg && <p className="text-red-600 text-sm">{errorMsg}</p>}
         </div>
 
         <button
           onClick={logout}
-          className="border px-3 py-1 rounded hover:bg-gray-100 w-fit"
+          className="border px-4 py-2 rounded hover:bg-gray-100 w-fit"
         >
           Logout
         </button>
       </div>
 
       {/* -------- Category Section -------- */}
-      <section className="space-y-3">
-        <div className="flex justify-between items-center">
+      <section className="space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <h3 className="font-semibold">Categories</h3>
           <button
-            className="border px-3 py-1 rounded"
+            className="border px-4 py-2 rounded w-fit"
             onClick={() => {
               setEditCategory(null);
               setOpenDialog(true);
@@ -76,25 +76,30 @@ export default function Dashboard() {
             No categories yet. Click "Add Category" to create your first one.
           </p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {categories.map((category) => (
-              <li key={category._id} className="flex items-center gap-3">
+              <li
+                key={category._id}
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
+              >
                 <strong>{category.name}</strong>{' '}
-                <button
-                  className="text-blue-600 text-sm"
-                  onClick={() => {
-                    setEditCategory(category);
-                    setOpenDialog(true);
-                  }}
-                >
-                  Edit
-                </button>{' '}
-                <button
-                  className="text-red-600 text-sm"
-                  onClick={() => handleDeleteCategory(category._id)}
-                >
-                  Delete
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    className="text-blue-600 text-sm"
+                    onClick={() => {
+                      setEditCategory(category);
+                      setOpenDialog(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-600 text-sm"
+                    onClick={() => handleDeleteCategory(category._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -102,11 +107,11 @@ export default function Dashboard() {
       </section>
 
       {/* -------- Subcategory Section -------- */}
-      <section className="space-y-3">
-        <div className="flex justify-between items-center">
+      <section className="space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <h3 className="font-semibold">Subcategories</h3>
           <button
-            className="border px-3 py-1 rounded"
+            className="border px-4 py-2 rounded w-fit"
             onClick={() => {
               setEditSubcategory(null);
               setOpenSubDialog(true);
@@ -123,28 +128,33 @@ export default function Dashboard() {
             No subcategories yet. Add one new subcategory under a category.
           </p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {subcategories.map((subcategory) => (
-              <li key={subcategory._id} className="flex items-center gap-3">
+              <li
+                key={subcategory._id}
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
+              >
                 <strong>{subcategory.name}</strong>
                 <span className="text-sm text-gray-500">
                   {subcategory.category?.name}
                 </span>
-                <button
-                  className="text-blue-600 text-sm"
-                  onClick={() => {
-                    setEditSubcategory(subcategory);
-                    setOpenSubDialog(true);
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  className="text-red-600 text-sm"
-                  onClick={() => handleDeleteSubcategory(subcategory._id)}
-                >
-                  Delete
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    className="text-blue-600 text-sm"
+                    onClick={() => {
+                      setEditSubcategory(subcategory);
+                      setOpenSubDialog(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-600 text-sm"
+                    onClick={() => handleDeleteSubcategory(subcategory._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -152,11 +162,11 @@ export default function Dashboard() {
       </section>
 
       {/* -------- Product Section -------- */}
-      <section className="space-y-3">
-        <div className="flex justify-between items-center">
+      <section className="space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <h3 className="font-semibold">Products</h3>
           <button
-            className="border px-3 py-1 rounded"
+            className="border px-4 py-2 rounded w-fit"
             onClick={() => {
               setEditProduct(null);
               setOpenProdDialog(true);
@@ -169,27 +179,37 @@ export default function Dashboard() {
         {loading.products ? (
           <p className="text-gray-500">Loading products...</p>
         ) : products.length === 0 ? (
-          <p className="text-gray-500">No products yet. Add your first product.</p>
+          <p className="text-gray-500">
+            No products yet. Add your first product.
+          </p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {products.map((prod) => (
-              <li key={prod._id} className="flex items-center gap-3">
+              <li
+                key={prod._id}
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
+              >
                 <strong>{prod.name}</strong>
-                <span className="text-sm text-gray-500">{prod.category?.name}</span>
-                <button
-                className="text-blue-600 text-sm"
-                  onClick={() => {
-                    setEditProduct(prod);
-                    setOpenProdDialog(true);
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                className="text-red-600 text-sm"
-                 onClick={() => handleDeleteProduct(prod._id)}>
-                  Delete
-                </button>
+                <span className="text-sm text-gray-500">
+                  {prod.category?.name}
+                </span>
+                <div className="flex gap-3">
+                  <button
+                    className="text-blue-600 text-sm"
+                    onClick={() => {
+                      setEditProduct(prod);
+                      setOpenProdDialog(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-red-600 text-sm"
+                    onClick={() => handleDeleteProduct(prod._id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
