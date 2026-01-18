@@ -67,9 +67,9 @@ export default function CategoryFormDialog({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
           >
-            <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+            <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 relative">
               <button
-                className="absolute top-3 right-3 disabled:opacity-60"
+                className="absolute top-3 right-3 p-2 rounded hover:bg-gray-100 disabled:opacity-60"
                 onClick={!loading ? onClose : undefined}
                 disabled={loading}
               >

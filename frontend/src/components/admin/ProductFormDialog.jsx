@@ -112,7 +112,7 @@ export default function ProductFormDialog({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
           >
-            <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+            <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 relative">
               <button
                 className="absolute top-3 right-3 disabled:opacity-60"
                 onClick={!loading ? onClose : undefined}
@@ -132,14 +132,14 @@ export default function ProductFormDialog({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 />
 
                 <input
                   placeholder="Brand"
                   value={brand}
                   onChange={(e) => setBrand(e.target.value)}
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 />
 
                 <input
@@ -148,7 +148,7 @@ export default function ProductFormDialog({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   required
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 />
 
                 <input
@@ -156,14 +156,14 @@ export default function ProductFormDialog({
                   value={externalUrl}
                   onChange={(e) => setExternalUrl(e.target.value)}
                   required
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 />
 
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   required
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 >
                   <option value="">Select Category</option>
                   {categories.map((cat) => (
@@ -177,7 +177,7 @@ export default function ProductFormDialog({
                   value={subcategoryId}
                   onChange={(e) => setSubcategoryId(e.target.value)}
                   required
-                  className="w-full border rounded px-3 py-2"
+                  className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/20"
                 >
                   <option value="">Select Subcategory</option>
                   {subcategories.map((subcategory) => (
