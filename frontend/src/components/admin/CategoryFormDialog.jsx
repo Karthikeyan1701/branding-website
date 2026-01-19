@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import api from '../../api/axios';
+import { createCategory, updateCategory } from '../../api/category.api';
 
 export default function CategoryFormDialog({
   open,
@@ -32,16 +32,15 @@ export default function CategoryFormDialog({
 
     try {
       if (editData) {
-        await api.put(`/categories/${editData._id}`, { name });
+        await updateCategory(editData._id, { name });
       } else {
-        await api.post('/categories', { name });
+        await createCategory({ name });
       }
 
       onSuccess();
       onClose();
     } catch (err) {
-      console.error(err);
-      setError('Failed to save category');
+      setError(err.message);
     } finally {
       setLoading(false);
     }

@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import api from '../../api/axios';
+import { getCategories } from '../../api/category.api';
+import { getSubcategoriesByCategory } from '../../api/subcategory.api';
+import { createProduct, updateProduct } from '../../api/product.api';
 
 export default function ProductFormDialog({
   open,
@@ -32,13 +34,12 @@ export default function ProductFormDialog({
   }, [open]);
 
   useEffect(() => {
-    api.get('/categories').then((res) => setCategories(res.data));
+    getCategories().then((res) => setCategories(res.data));
   }, []);
 
   useEffect(() => {
     if (!categoryId) return;
-    api
-      .get(`/subcategories/category/${categoryId}`)
+    getSubcategoriesByCategory(categoryId)
       .then((res) => setSubcategories(res.data));
   }, [categoryId]);
 
@@ -77,16 +78,15 @@ export default function ProductFormDialog({
       };
 
       if (editData) {
-        await api.put(`/products/${editData._id}`, payload);
+        await updateProduct(editData._id, payload);
       } else {
-        await api.post('/products', payload);
+        await createProduct('/products', payload);
       }
 
       onSuccess();
       onClose();
     } catch (err) {
-      console.error(err);
-      setError('Failed to save product');
+      setError(err.message);
     } finally {
       setLoading(false);
     }

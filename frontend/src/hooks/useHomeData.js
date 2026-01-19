@@ -1,5 +1,7 @@
 import { useState, useReducer, useEffect } from 'react';
-import api from '../api/axios';
+import { getProductsBySubcategory } from '../api/product.api';
+import { getSubcategoriesByCategory } from '../api/subcategory.api';
+import { getCategories } from '../api/category.api';
 
 const initialState = {
   categories: [],
@@ -56,6 +58,7 @@ function dataReducer(state, action) {
       return {
         ...state,
         loading: { ...state.loading, subcategories: true },
+        products: [],
         error: '',
       };
 
@@ -117,15 +120,15 @@ export default function useHomeData() {
     const fetchCategories = async () => {
       dispatch({ type: ACTIONS.FETCH_CATEGORIES_START });
       try {
-        const res = await api.get('/categories');
+        const res = await getCategories();
         dispatch({
           type: ACTIONS.FETCH_CATEGORIES_SUCCESS,
           payload: res.data,
         });
-      } catch {
+      } catch (error) {
         dispatch({
           type: ACTIONS.FETCH_CATEGORIES_ERROR,
-          payload: 'Failed to load categories',
+          payload: error.message || 'Failed to load categories',
         });
       }
     };
@@ -141,18 +144,16 @@ export default function useHomeData() {
     const fetchSubcategories = async () => {
       dispatch({ type: ACTIONS.FETCH_SUBCATEGORIES_START });
       try {
-        const res = await api.get(
-          `/subcategories/category/${selectedCategoryId}`
-        );
+        const res = await getSubcategoriesByCategory(selectedCategoryId);
         dispatch({
           type: ACTIONS.FETCH_SUBCATEGORIES_SUCCESS,
           payload: res.data,
         });
         setSelectedSubcategoryId(null);
-      } catch {
+      } catch (error) {
         dispatch({
           type: ACTIONS.FETCH_SUBCATEGORIES_ERROR,
-          payload: 'Failed to load subcategories',
+          payload: error.message || 'Failed to load subcategories',
         });
       }
     };
@@ -167,18 +168,16 @@ export default function useHomeData() {
     const fetchProducts = async () => {
       dispatch({ type: ACTIONS.FETCH_PRODUCTS_START });
       try {
-        const res = await api.get(
-          `/products/subcategory/${selectedSubcategoryId}`
-        );
+        const res = await getProductsBySubcategory(selectedSubcategoryId);
         dispatch({
           type: ACTIONS.FETCH_PRODUCTS_SUCCESS,
           payload: res.data,
         });
-      } catch {
+      } catch (error) {
         dispatch({
           type: ACTIONS.FETCH_PRODUCTS_ERROR,
-          payload: 'Failed to load products',
-        })
+          payload: error.message || 'Failed to load products',
+        });
       }
     };
 

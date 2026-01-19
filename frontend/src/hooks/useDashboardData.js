@@ -1,5 +1,7 @@
 import { useReducer, useEffect, useCallback } from 'react';
-import api from '../api/axios';
+import { deleteCategory, getCategories } from '../api/category.api';
+import { deleteSubcategory, getSubcategoriesByCategory } from '../api/subcategory.api';
+import { deleteProduct, getProductsBySubcategory } from '../api/product.api';
 
 const initialState = {
   categories: [],
@@ -57,6 +59,8 @@ function dataReducer(state, action) {
     case ACTIONS.FETCH_SUBCATEGORIES_START:
       return {
         ...state,
+        subcategories: [],
+        products: [],
         loading: { ...state.loading, subcategories: true },
       };
 
@@ -129,56 +133,54 @@ export default function useDashboardData() {
   const fetchCategories = useCallback(async () => {
     dispatch({ type: ACTIONS.FETCH_CATEGORIES_START });
     try {
-      const res = await api.get('/categories');
+      const res = await getCategories();
       dispatch({
         type: ACTIONS.FETCH_CATEGORIES_SUCCESS,
         payload: res.data,
       });
-    } catch {
+    } catch (error) {
       dispatch({
         type: ACTIONS.FETCH_CATEGORIES_ERROR,
-        payload: 'Failed to load categories',
+        payload: error.message || 'Failed to load categories',
       });
     }
   }, [dispatch]);
 
-  const fetchSubcategories = useCallback(async () => {
+  const fetchSubcategories = useCallback(async (categoryId) => {
     dispatch({ type: ACTIONS.FETCH_SUBCATEGORIES_START });
     try {
-      const res = await api.get('/subcategories');
+      const res = await getSubcategoriesByCategory(categoryId);
       dispatch({
         type: ACTIONS.FETCH_SUBCATEGORIES_SUCCESS,
         payload: res.data,
       });
-    } catch {
+    } catch (error) {
       dispatch({
         type: ACTIONS.FETCH_SUBCATEGORIES_ERROR,
-        payload: 'Failed to load subcategories',
+        payload: error.message || 'Failed to load subcategories',
       });
     }
   }, [dispatch]);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (subcategoryId) => {
     dispatch({ type: ACTIONS.FETCH_PRODUCTS_START });
     try {
-      const res = await api.get('/products');
+      const res = await getProductsBySubcategory(subcategoryId);
       dispatch({
         type: ACTIONS.FETCH_PRODUCTS_SUCCESS,
         payload: res.data,
       });
-    } catch {
+    } catch (error) {
       dispatch({
         type: ACTIONS.FETCH_PRODUCTS_ERROR,
-        payload: 'Failed to load products',
+        payload: error.message || 'Failed to load products',
       });
     }
   }, [dispatch]);
 
   useEffect(() => {
     fetchCategories();
-    fetchSubcategories();
-    fetchProducts();
-  }, [fetchCategories, fetchSubcategories, fetchProducts]);
+  }, [fetchCategories]);
 
   const showSuccessMsg = (msg) => {
     dispatch({ type: ACTIONS.SET_SUCCESS, payload: msg });
@@ -200,46 +202,46 @@ export default function useDashboardData() {
 
   const handleDeleteCategory = async (id) => {
     const confirmDeleteCategory = window.confirm(
-      'Are you sure you want to delete this category?\nThis action cannot be undone.'
+      'Are you sure you want to delete this category?\nThis action cannot be undone.',
     );
     if (!confirmDeleteCategory) return;
 
     try {
-      await api.delete(`/categories/${id}`);
+      await deleteCategory(id);
       fetchCategories();
       showSuccessMsg('Category deleted successfully');
-    } catch {
-      showErrorMsg('Failed to delete category');
+    } catch (error) {
+      showErrorMsg( error.message || 'Failed to delete category');
     }
   };
 
   const handleDeleteSubcategory = async (id) => {
     const confirmDeleteSubcategory = window.confirm(
-      'Are you sure you want to delete this subcategory?\nThis action cannot be undone.'
+      'Are you sure you want to delete this subcategory?\nThis action cannot be undone.',
     );
     if (!confirmDeleteSubcategory) return;
 
     try {
-      await api.delete(`/subcategories/${id}`);
+      await deleteSubcategory(id);
       fetchSubcategories();
       showSuccessMsg('Subcategory deleted successfully');
-    } catch {
-      showErrorMsg('Failed to delete subcategory');
+    } catch (error) {
+      showErrorMsg(error.message || 'Failed to delete subcategory');
     }
   };
 
   const handleDeleteProduct = async (id) => {
     const confirmDeleteProduct = window.confirm(
-      'Are you sure you want to delete this product?\nThis action cannot be undone.'
+      'Are you sure you want to delete this product?\nThis action cannot be undone.',
     );
     if (!confirmDeleteProduct) return;
 
     try {
-      await api.delete(`/products/${id}`);
+      await deleteProduct(id);
       fetchProducts();
       showSuccessMsg('Product deleted successfully');
-    } catch {
-      showErrorMsg('Failed to delete product');
+    } catch (error) {
+      showErrorMsg(error.message || 'Failed to delete product');
     }
   };
 

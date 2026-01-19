@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import api from '../../api/axios';
+import { getCategories } from '../../api/category.api';
+import { createSubcategory, updateSubcategory } from '../../api/subcategory.api';
 
 export default function SubcategoryFormDialog({
   open,
@@ -24,7 +25,7 @@ export default function SubcategoryFormDialog({
   }, [open]);
 
   useEffect(() => {
-    api.get('/categories').then((res) => setCategories(res.data));
+    getCategories().then((res) => setCategories(res.data));
   }, []);
 
   useEffect(() => {
@@ -44,16 +45,15 @@ export default function SubcategoryFormDialog({
 
     try {
       if (editData) {
-        await api.put(`/subcategories/${editData._id}`, { name, categoryId });
+        await updateSubcategory(editData._id, { name, categoryId });
       } else {
-        await api.post('/subcategories', { name, categoryId });
+        await createSubcategory({ name, categoryId });
       }
 
       onSuccess();
       onClose();
     } catch (err) {
-      console.error(err);
-      setError('Failed to save subcategory');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
