@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import ProductDetails from '../components/ProductDetails';
 import useHomeData from '../hooks/useHomeData';
+import ProductCard from "../components/ProductCard";
 
 export default function Home() {
 
@@ -18,6 +19,25 @@ export default function Home() {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [activeProduct, setActiveProduct] = useState(null);
+
+  const filteredSubcategories = useMemo(() => {
+    if (!selectedCategoryId) return [];
+    return subcategories.filter(
+      (sub) => sub.category?._id === selectedCategoryId
+    );
+  }, [subcategories, selectedCategoryId]);
+
+  const filteredProducts = useMemo(() => {
+    if (!selectedSubcategoryId) return [];
+    return products.filter(
+      (prod) => prod.subcategory?._id === selectedSubcategoryId
+    );
+  }, [products, selectedSubcategoryId]);
+
+  const handleViewProduct = useCallback((product) => {
+    setActiveProduct(product);
+    setOpenDialog(true);
+  }, []);
 
   return (
     <div className="space-y-10 px-4 md:px-6 lg:px-8">
@@ -74,7 +94,7 @@ export default function Home() {
             </p>
           ) : (
             <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {subcategories.map((subcategory) => (
+              {filteredSubcategories.map((subcategory) => (
                 <li key={subcategory._id}>
                   <button
                     onClick={() => setSelectedSubcategoryId(subcategory._id)}
@@ -106,28 +126,12 @@ export default function Home() {
             </p>
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {products.map((product) => (
-                <li
+              {filteredProducts.map((product) => (
+                <ProductCard 
                   key={product._id}
-                  className="border rounded-lg p-4 space-y-3 transition hover:shadow-sm"
-                >
-                  <div>
-                    <strong className="block text-sm">{product.name}</strong>
-                    <span className="text-gray-600 text-sm">
-                      ₹{product.price}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setActiveProduct(product);
-                      setOpenDialog(true);
-                    }}
-                    className="text-blue-600 text-sm hover:underline"
-                  >
-                    View Details
-                  </button>
-                </li>
+                  product={product}
+                  onView={handleViewProduct}
+                />
               ))}
             </ul>
           )}

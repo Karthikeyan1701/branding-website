@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../context/useAuth';
 import useDashboardData from '../hooks/useDashboardData';
 
@@ -33,6 +33,12 @@ export default function Dashboard() {
 
   const [openProdDialog, setOpenProdDialog] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
+
+  const sortedCategories = useMemo(() => {
+    return [...categories].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }, [categories]);
 
   return (
     <div className="space-y-10 px-4 md:px-6 lg:px-8">
@@ -77,7 +83,7 @@ export default function Dashboard() {
           </p>
         ) : (
           <ul className="space-y-3">
-            {categories.map((category) => (
+            {sortedCategories.map((category) => (
               <li
                 key={category._id}
                 className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
