@@ -1,10 +1,8 @@
-import { useCallback, useState, useMemo } from 'react';
-import ProductDetails from '../components/ProductDetails';
+import { useCallback, useState, useMemo, lazy, Suspense } from 'react';
 import useHomeData from '../hooks/useHomeData';
-import ProductCard from "../components/ProductCard";
+import ProductCard from '../components/ProductCard';
 
 export default function Home() {
-
   const {
     categories,
     subcategories,
@@ -17,20 +15,22 @@ export default function Home() {
     setSelectedSubcategoryId,
   } = useHomeData();
 
+  const ProductDetails = lazy(() => import('../components/ProductDetails'));
+
   const [openDialog, setOpenDialog] = useState(false);
   const [activeProduct, setActiveProduct] = useState(null);
 
   const filteredSubcategories = useMemo(() => {
     if (!selectedCategoryId) return [];
     return subcategories.filter(
-      (sub) => sub.category?._id === selectedCategoryId
+      (sub) => sub.category?._id === selectedCategoryId,
     );
   }, [subcategories, selectedCategoryId]);
 
   const filteredProducts = useMemo(() => {
     if (!selectedSubcategoryId) return [];
     return products.filter(
-      (prod) => prod.subcategory?._id === selectedSubcategoryId
+      (prod) => prod.subcategory?._id === selectedSubcategoryId,
     );
   }, [products, selectedSubcategoryId]);
 
@@ -43,7 +43,9 @@ export default function Home() {
     <div className="space-y-10 px-4 md:px-6 lg:px-8">
       {/* Page Header */}
       <div className="space-y-1">
-        <h1 className="text-xl md:text-2xl font-semibold">Explore Our Products</h1>
+        <h1 className="text-xl md:text-2xl font-semibold">
+          Explore Our Products
+        </h1>
         <p className="text-sm text-gray-500 max-w-2xl">
           Browse categories, choose a subcategory, and view products.
         </p>
@@ -127,7 +129,7 @@ export default function Home() {
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredProducts.map((product) => (
-                <ProductCard 
+                <ProductCard
                   key={product._id}
                   product={product}
                   onView={handleViewProduct}
@@ -139,11 +141,15 @@ export default function Home() {
       )}
 
       {/* DIALOG BOX UI */}
-      <ProductDetails
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        product={activeProduct}
-      />
+      {openDialog && activeProduct && (
+        <Suspense fallback={<div className="p-4">Loading product details...</div>}>
+          <ProductDetails
+            open={openDialog}
+            onClose={() => setOpenDialog(false)}
+            product={activeProduct}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

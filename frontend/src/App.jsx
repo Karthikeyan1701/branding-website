@@ -1,4 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -7,17 +9,23 @@ import About from './pages/About';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import AdminLogin from './pages/AdminLogin';
-import Dashboard from './pages/Dashboard';
 
-function App() {
+// Lazy-loaded admin modules
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+
+export default function App() {
   return (
-    <MainLayout>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/contact" element={<Contact />} />
+        </Route>
+
+        {/* Admin Login */}
         <Route path="/admin" element={<AdminLogin />} />
 
         {/* Protected admin routes */}
@@ -25,13 +33,19 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Suspense fallback={<div className="p-6">Loading admin...</div>}>
+                <AdminLayout />
+              </Suspense>
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={
+            <Suspense fallback={<div className="p-6">Loading dashboard</div>}>
+              <Dashboard />
+            </Suspense>
+          }
+          />
+        </Route>
       </Routes>
-    </MainLayout>
   );
 }
-
-export default App;
