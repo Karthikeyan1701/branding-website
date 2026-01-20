@@ -22,7 +22,7 @@ export default function CategoryFormDialog({
   }, [open]);
 
   useEffect(() => {
-      setName(editData ? editData.name : '');
+    setName(editData ? editData.name : '');
   }, [editData]);
 
   const handleSubmit = async (e) => {
@@ -39,8 +39,8 @@ export default function CategoryFormDialog({
 
       onSuccess();
       onClose();
-    } catch (err) {
-      setError(err.message);
+    } catch {
+      setError('Unable to save category. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -75,8 +75,9 @@ export default function CategoryFormDialog({
                 <X size={18} />
               </button>
 
-              <h3 className="text-lg font-semibold mb-3"
-              >{editData ? 'Edit Category' : 'Add Category'}</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {editData ? 'Edit Category' : 'Add Category'}
+              </h3>
 
               {error && <p className="text-red-600 mb-2">{error}</p>}
 
@@ -91,7 +92,11 @@ export default function CategoryFormDialog({
                 />
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <button type="submit" disabled={loading} className="bg-black text-white px-4 py-2 rounded disabled:opacity-60">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+                  >
                     {loading ? 'Saving...' : 'Save'}
                   </button>
                   <button

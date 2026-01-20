@@ -82,6 +82,7 @@ function dataReducer(state, action) {
       return {
         ...state,
         loading: { ...state.loading, products: true },
+        products: [],
       };
 
     case ACTIONS.FETCH_PRODUCTS_SUCCESS:
@@ -138,13 +139,13 @@ export default function useDashboardData() {
         type: ACTIONS.FETCH_CATEGORIES_SUCCESS,
         payload: res.data,
       });
-    } catch (error) {
+    } catch {
       dispatch({
         type: ACTIONS.FETCH_CATEGORIES_ERROR,
-        payload: error.message || 'Failed to load categories',
+        payload: 'Unable to load categories. Please try again.',
       });
     }
-  }, [dispatch]);
+  }, []);
 
   const fetchSubcategories = useCallback(async (categoryId) => {
     dispatch({ type: ACTIONS.FETCH_SUBCATEGORIES_START });
@@ -154,13 +155,13 @@ export default function useDashboardData() {
         type: ACTIONS.FETCH_SUBCATEGORIES_SUCCESS,
         payload: res.data,
       });
-    } catch (error) {
+    } catch {
       dispatch({
         type: ACTIONS.FETCH_SUBCATEGORIES_ERROR,
-        payload: error.message || 'Failed to load subcategories',
+        payload: 'Unable to load subcategories. Please try again.',
       });
     }
-  }, [dispatch]);
+  }, []);
 
   const fetchProducts = useCallback(async (subcategoryId) => {
     dispatch({ type: ACTIONS.FETCH_PRODUCTS_START });
@@ -170,13 +171,13 @@ export default function useDashboardData() {
         type: ACTIONS.FETCH_PRODUCTS_SUCCESS,
         payload: res.data,
       });
-    } catch (error) {
+    } catch {
       dispatch({
         type: ACTIONS.FETCH_PRODUCTS_ERROR,
-        payload: error.message || 'Failed to load products',
+        payload: 'Unable to load products. Please try again.',
       });
     }
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     fetchCategories();
@@ -210,8 +211,8 @@ export default function useDashboardData() {
       await deleteCategory(id);
       fetchCategories();
       showSuccessMsg('Category deleted successfully');
-    } catch (error) {
-      showErrorMsg( error.message || 'Failed to delete category');
+    } catch {
+      showErrorMsg('Unable to delete category. Please try again.');
     }
   };
 
@@ -225,8 +226,8 @@ export default function useDashboardData() {
       await deleteSubcategory(id);
       fetchSubcategories();
       showSuccessMsg('Subcategory deleted successfully');
-    } catch (error) {
-      showErrorMsg(error.message || 'Failed to delete subcategory');
+    } catch {
+      showErrorMsg('Unable to delete subcategory. Please try again.');
     }
   };
 
@@ -240,8 +241,8 @@ export default function useDashboardData() {
       await deleteProduct(id);
       fetchProducts();
       showSuccessMsg('Product deleted successfully');
-    } catch (error) {
-      showErrorMsg(error.message || 'Failed to delete product');
+    } catch {
+      showErrorMsg('Unable to delete product. Please try again.');
     }
   };
 

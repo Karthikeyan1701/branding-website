@@ -23,11 +23,9 @@ export default function AdminLogin() {
 
       // save token in context
       login(res.data.token);
-
-      setMessage('Login successful!');
       navigate('/dashboard');
-    } catch (error) {
-      setMessage(error.response?.data?.message || 'Login failed');
+    } catch {
+      setMessage('Invalid credentials. Please try again.');
     }
   };
 

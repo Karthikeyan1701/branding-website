@@ -85,8 +85,8 @@ export default function ProductFormDialog({
 
       onSuccess();
       onClose();
-    } catch (err) {
-      setError(err.message);
+    } catch {
+      setError('Unable to save product. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -124,6 +124,12 @@ export default function ProductFormDialog({
               <h3 className="text-lg font-semibold mb-3">{editData ? 'Edit Product' : 'Add Product'}</h3>
 
               {error && <p className="text-red-600 mb-2">{error}</p>}
+
+              {categories.length === 0 && !editData && (
+                <p className="text-sm text-gray-500 mb-3">
+                  No categories available. Please create a category first.
+                </p>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-3">
                 <input
@@ -188,7 +194,7 @@ export default function ProductFormDialog({
                 </select>
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <button type="submit" disabled={loading} className="bg-black text-white px-4 py-2 rounded disabled:opacity-60">
+                  <button type="submit" disabled={loading || categories.length === 0 || (categoryId && subcategories.length === 0)} className="bg-black text-white px-4 py-2 rounded disabled:opacity-60">
                     {loading ? 'Saving...' : 'Save'}
                   </button>
                   <button

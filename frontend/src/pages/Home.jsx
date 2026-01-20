@@ -1,6 +1,7 @@
 import { useCallback, useState, useMemo, lazy, Suspense } from 'react';
 import useHomeData from '../hooks/useHomeData';
 import ProductCard from '../components/ProductCard';
+import Skeleton from '../components/Skeleton';
 
 export default function Home() {
   const {
@@ -57,10 +58,14 @@ export default function Home() {
       <section className="space-y-4">
         <h3 className="font-semibold text-lg">Categories</h3>
         {loading.categories ? (
-          <p className="text-gray-500">Loading Categories...</p>
+          <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-14" />
+            ))}
+          </ul>
         ) : categories.length === 0 ? (
           <p className="text-gray-500 text-sm">
-            No categories available at the moment.
+            No categories are available right now. Please check back later.
           </p>
         ) : (
           <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -84,15 +89,26 @@ export default function Home() {
       </section>
 
       {/* SUBCATEGORIES UI */}
+      {!selectedCategoryId && (
+        <p className="text-sm text-gray-500">
+          Select a category to view available subcategories.
+        </p>
+      )}
+
+
       {selectedCategoryId && (
         <section className="space-y-4">
           <h3 className="font-semibold text-lg">Subcategories</h3>
 
           {loading.subcategories ? (
-            <p className="text-gray-500">Loading subcategories...</p>
-          ) : subcategories.length === 0 ? (
+            <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-14" />
+              ))}
+            </ul>
+          ) : filteredSubcategories.length === 0 ? (
             <p className="text-gray-500 text-sm">
-              No subcategories found for this category.
+              No subcategories found in this category.
             </p>
           ) : (
             <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -116,13 +132,27 @@ export default function Home() {
       )}
 
       {/* PRODUCTS UI */}
+      {selectedCategoryId && !selectedCategoryId && (
+        <p className='text-sm text-gray-500'>
+          Select a subcategory to view products.
+        </p>
+      )}
+
       {selectedSubcategoryId && (
         <section className="space-y-4">
           <h3 className="font-semibold text-lg">Products</h3>
 
           {loading.products ? (
-            <p className="text-gray-500">Loading products...</p>
-          ) : products.length === 0 ? (
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <li key={i} className="space-y-3">
+                  <Skeleton className="h-32" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </li>
+              ))}
+            </ul>
+          ) : filteredProducts.length === 0 ? (
             <p className="text-gray-500 text-sm">
               No products found in this subcategory.
             </p>
@@ -142,7 +172,9 @@ export default function Home() {
 
       {/* DIALOG BOX UI */}
       {openDialog && activeProduct && (
-        <Suspense fallback={<div className="p-4">Loading product details...</div>}>
+        <Suspense
+          fallback={<div className="p-4">Loading product details...</div>}
+        >
           <ProductDetails
             open={openDialog}
             onClose={() => setOpenDialog(false)}

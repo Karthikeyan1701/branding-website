@@ -41,25 +41,42 @@ export default function ProductDetails({ open, onClose, product }) {
               </button>
 
               {!product ? (
-                <p className="text-gray-500 text-sm">Loading product details...</p>
+                <p className="text-gray-500 text-sm">
+                  Product details are unavailable.
+                </p>
               ) : (
                 <div className="space-y-4">
-                  <h3 className="text-lg sm:text-xl font-semibold">{product.name}</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold">
+                    {product.name || 'Unnamed product'}
+                  </h3>
 
                   <div className="text-sm text-gray-600 space-y-1">
                     {product.brand && <p>Brand: {product.brand}</p>}
-                    <p>Price: ₹{product.price}</p>
+                    <p>
+                      Price:{' '}
+                      {product.price
+                        ? `₹${product.price}`
+                        : 'Price not available'}
+                    </p>
                   </div>
 
                   <div className="h-px bg-gray-200" />
 
                   <div className="flex flex-col gap-3">
-                    <button
-                      onClick={() => window.open(product.externalUrl, '_blank')}
-                      className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-                    >
-                      Buy from trusted partner site
-                    </button>
+                    {product.externalUrl ? (
+                      <button
+                        onClick={() =>
+                          window.open(product.externalUrl, '_blank')
+                        }
+                        className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+                      >
+                        Buy from trusted partner site
+                      </button>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        External purchase link not available for this product.
+                      </p>
+                    )}
 
                     <p className="text-xs text-gray-500 leading-relaxed">
                       You will be redirected to a secure external website.

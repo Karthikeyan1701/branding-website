@@ -125,10 +125,10 @@ export default function useHomeData() {
           type: ACTIONS.FETCH_CATEGORIES_SUCCESS,
           payload: res.data,
         });
-      } catch (error) {
+      } catch {
         dispatch({
           type: ACTIONS.FETCH_CATEGORIES_ERROR,
-          payload: error.message || 'Failed to load categories',
+          payload: 'Unable to load data right now. Please refresh the page.',
         });
       }
     };
@@ -150,10 +150,10 @@ export default function useHomeData() {
           payload: res.data,
         });
         setSelectedSubcategoryId(null);
-      } catch (error) {
+      } catch {
         dispatch({
           type: ACTIONS.FETCH_SUBCATEGORIES_ERROR,
-          payload: error.message || 'Failed to load subcategories',
+          payload: 'Unable to load data right now. Please refresh the page.',
         });
       }
     };
@@ -173,10 +173,10 @@ export default function useHomeData() {
           type: ACTIONS.FETCH_PRODUCTS_SUCCESS,
           payload: res.data,
         });
-      } catch (error) {
+      } catch {
         dispatch({
           type: ACTIONS.FETCH_PRODUCTS_ERROR,
-          payload: error.message || 'Failed to load products',
+          payload: 'Unable to load data right now. Please refresh the page.',
         });
       }
     };

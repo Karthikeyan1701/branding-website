@@ -4,7 +4,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { getCategories } from '../../api/category.api';
-import { createSubcategory, updateSubcategory } from '../../api/subcategory.api';
+import {
+  createSubcategory,
+  updateSubcategory,
+} from '../../api/subcategory.api';
 
 export default function SubcategoryFormDialog({
   open,
@@ -52,8 +55,8 @@ export default function SubcategoryFormDialog({
 
       onSuccess();
       onClose();
-    } catch (err) {
-      setError(err.message);
+    } catch {
+      setError('Unable to save subcategory. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -88,9 +91,17 @@ export default function SubcategoryFormDialog({
                 <X size={18} />
               </button>
 
-              <h3 className="text-lg font-semibold mb-3">{editData ? 'Edit Subcategory' : 'Add Subcategory'}</h3>
+              <h3 className="text-lg font-semibold mb-3">
+                {editData ? 'Edit Subcategory' : 'Add Subcategory'}
+              </h3>
 
               {error && <p className="text-red-600 mb-2">{error}</p>}
+
+              {categories.length === 0 && !editData && (
+                <p className="text-sm text-gray-500 mb-3">
+                  No categories available. Please create a category first.
+                </p>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-3">
                 <input
@@ -117,7 +128,11 @@ export default function SubcategoryFormDialog({
                 </select>
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <button type="submit" disabled={loading} className="bg-black text-white px-4 py-2 rounded disabled:opacity-60">
+                  <button
+                    type="submit"
+                    disabled={loading || categories.length === 0}
+                    className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+                  >
                     {loading ? 'Saving...' : 'Save'}
                   </button>
                   <button

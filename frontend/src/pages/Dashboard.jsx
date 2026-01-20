@@ -5,6 +5,7 @@ import useDashboardData from '../hooks/useDashboardData';
 import CategoryFormDialog from '../components/admin/CategoryFormDialog';
 import SubcategoryFormDialog from '../components/admin/SubcategoryFormDialog';
 import ProductFormDialog from '../components/admin/ProductFormDialog';
+import Skeleton from '../components/Skeleton';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -35,9 +36,7 @@ export default function Dashboard() {
   const [editProduct, setEditProduct] = useState(null);
 
   const sortedCategories = useMemo(() => {
-    return [...categories].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+    return [...categories].sort((a, b) => a.name.localeCompare(b.name));
   }, [categories]);
 
   return (
@@ -76,7 +75,11 @@ export default function Dashboard() {
         </div>
 
         {loading.categories ? (
-          <p className="text-gray-500">Loading categories...</p>
+          <ul className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-6 w-1/2" />
+            ))}
+          </ul>
         ) : categories.length === 0 ? (
           <p className="text-gray-500">
             No categories yet. Click "Add Category" to create your first one.
@@ -128,7 +131,11 @@ export default function Dashboard() {
         </div>
 
         {loading.subcategories ? (
-          <p className="text-gray-500">Loading subcategories...</p>
+          <ul className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-6 w-2/3" />
+            ))}
+          </ul>
         ) : subcategories.length === 0 ? (
           <p className="text-gray-500">
             No subcategories yet. Add one new subcategory under a category.
@@ -183,7 +190,11 @@ export default function Dashboard() {
         </div>
 
         {loading.products ? (
-          <p className="text-gray-500">Loading products...</p>
+          <ul className="space-y-3">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-6 w-3/4" />
+            ))}
+          </ul>
         ) : products.length === 0 ? (
           <p className="text-gray-500">
             No products yet. Add your first product.
