@@ -194,14 +194,14 @@ export default function ProductFormDialog({
                 </select>
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <button type="submit" disabled={loading || categories.length === 0 || (categoryId && subcategories.length === 0)} className="bg-black text-white px-4 py-2 rounded disabled:opacity-60">
+                  <button type="submit" disabled={loading || categories.length === 0 || (categoryId && subcategories.length === 0)} className="btn-primary">
                     {loading ? 'Saving...' : 'Save'}
                   </button>
                   <button
                     type="button"
                     onClick={!loading ? onClose : undefined}
                     disabled={loading}
-                    className="border px-4 py-2 rounded disabled:opacity-60"
+                    className="btn-secondary"
                   >
                     Cancel
                   </button>

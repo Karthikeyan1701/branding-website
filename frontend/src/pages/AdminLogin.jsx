@@ -57,7 +57,7 @@ export default function AdminLogin() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded hover:bg-gray-800"
+            className="w-full btn-primary"
           >
             Login
           </button>

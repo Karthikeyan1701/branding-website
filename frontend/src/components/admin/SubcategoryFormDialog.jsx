@@ -131,7 +131,7 @@ export default function SubcategoryFormDialog({
                   <button
                     type="submit"
                     disabled={loading || categories.length === 0}
-                    className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+                    className="btn-primary"
                   >
                     {loading ? 'Saving...' : 'Save'}
                   </button>
@@ -139,7 +139,7 @@ export default function SubcategoryFormDialog({
                     type="button"
                     onClick={!loading ? onClose : undefined}
                     disabled={loading}
-                    className="border px-4 py-2 rounded disabled:opacity-60"
+                    className="btn-secondary"
                   >
                     Cancel
                   </button>

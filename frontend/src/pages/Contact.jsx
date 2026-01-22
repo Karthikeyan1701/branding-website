@@ -78,7 +78,7 @@ export default function Contact() {
 
         <button type="submit"
           disabled={loading}
-          className="bg-black text-white px-6 py-2 rounded disabled:opacity-60"
+          className="btn-primary"
         >
           {loading ? 'Sending...' : 'Send Message'}
         </button>

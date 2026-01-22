@@ -73,12 +73,7 @@ export default function Home() {
               <li key={category._id}>
                 <button
                   onClick={() => setSelectedCategoryId(category._id)}
-                  className={`w-full border rounded-lg px-4 py-3 text-left text-sm transition hover:bg-gray-50 
-                    ${
-                      selectedCategoryId === category._id
-                        ? 'bg-gray-100 font-medium'
-                        : ''
-                    }`}
+                  className="btn-primary"
                 >
                   {category.name}
                 </button>
@@ -116,11 +111,7 @@ export default function Home() {
                 <li key={subcategory._id}>
                   <button
                     onClick={() => setSelectedSubcategoryId(subcategory._id)}
-                    className={`w-full border rounded px-4 py-3 text-left text-sm transition hover:bg-gray-50 ${
-                      selectedSubcategoryId === subcategory._id
-                        ? 'bg-gray-100 font-medium'
-                        : ''
-                    }`}
+                    className="btn-primary"
                   >
                     {subcategory.name}
                   </button>

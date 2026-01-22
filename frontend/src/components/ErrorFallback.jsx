@@ -10,7 +10,7 @@ export default function ErrorFallback({ error, resetErrorBoundary }) {
 
         <button
           onClick={resetErrorBoundary}
-          className="px-4 py-2 bg-black text-white rounded text-sm"
+          className="btn btn-secondary"
         >
           Try again
         </button>

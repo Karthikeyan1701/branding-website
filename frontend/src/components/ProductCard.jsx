@@ -8,7 +8,7 @@ function ProductCard({ product, onView }) {
                 <span className="text-gray-600 text-sm">₹{product.price}</span>
             </div>
 
-            <button onClick={() => onView(product)} className="text-blue-600 text-sm hover:underline">
+            <button onClick={() => onView(product)} className="btn btn-secondary">
                 View Details
             </button>
         </li>

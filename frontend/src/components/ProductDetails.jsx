@@ -68,7 +68,7 @@ export default function ProductDetails({ open, onClose, product }) {
                         onClick={() =>
                           window.open(product.externalUrl, '_blank')
                         }
-                        className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+                        className="btn btn-primary"
                       >
                         Buy from trusted partner site
                       </button>
@@ -84,7 +84,7 @@ export default function ProductDetails({ open, onClose, product }) {
 
                     <button
                       onClick={onClose}
-                      className="border px-4 py-2 rounded hover:bg-gray-50"
+                      className="btn btn-secondary"
                     >
                       Close
                     </button>

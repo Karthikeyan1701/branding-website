@@ -53,7 +53,7 @@ export default function Dashboard() {
 
         <button
           onClick={logout}
-          className="border px-4 py-2 rounded hover:bg-gray-100 w-fit"
+          className="btn-secondary"
         >
           Logout
         </button>
@@ -64,7 +64,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <h3 className="font-semibold">Categories</h3>
           <button
-            className="border px-4 py-2 rounded w-fit"
+            className="btn-secondary"
             onClick={() => {
               setEditCategory(null);
               setOpenDialog(true);
@@ -94,7 +94,7 @@ export default function Dashboard() {
                 <strong>{category.name}</strong>{' '}
                 <div className="flex gap-3">
                   <button
-                    className="text-blue-600 text-sm"
+                    className="btn-secondary"
                     onClick={() => {
                       setEditCategory(category);
                       setOpenDialog(true);
@@ -103,7 +103,7 @@ export default function Dashboard() {
                     Edit
                   </button>
                   <button
-                    className="text-red-600 text-sm"
+                    className="btn-danger"
                     onClick={() => handleDeleteCategory(category._id)}
                   >
                     Delete
@@ -120,7 +120,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <h3 className="font-semibold">Subcategories</h3>
           <button
-            className="border px-4 py-2 rounded w-fit"
+            className="btn-secondary"
             onClick={() => {
               setEditSubcategory(null);
               setOpenSubDialog(true);
@@ -153,7 +153,7 @@ export default function Dashboard() {
                 </span>
                 <div className="flex gap-3">
                   <button
-                    className="text-blue-600 text-sm"
+                    className="btn-secondary"
                     onClick={() => {
                       setEditSubcategory(subcategory);
                       setOpenSubDialog(true);
@@ -162,7 +162,7 @@ export default function Dashboard() {
                     Edit
                   </button>
                   <button
-                    className="text-red-600 text-sm"
+                    className="btn-danger"
                     onClick={() => handleDeleteSubcategory(subcategory._id)}
                   >
                     Delete
@@ -179,7 +179,7 @@ export default function Dashboard() {
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
           <h3 className="font-semibold">Products</h3>
           <button
-            className="border px-4 py-2 rounded w-fit"
+            className="btn-secondary"
             onClick={() => {
               setEditProduct(null);
               setOpenProdDialog(true);
@@ -212,7 +212,7 @@ export default function Dashboard() {
                 </span>
                 <div className="flex gap-3">
                   <button
-                    className="text-blue-600 text-sm"
+                    className="btn-secondary"
                     onClick={() => {
                       setEditProduct(prod);
                       setOpenProdDialog(true);
@@ -221,7 +221,7 @@ export default function Dashboard() {
                     Edit
                   </button>
                   <button
-                    className="text-red-600 text-sm"
+                    className="btn-danger"
                     onClick={() => handleDeleteProduct(prod._id)}
                   >
                     Delete
