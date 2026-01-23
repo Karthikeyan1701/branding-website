@@ -3,24 +3,22 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
 import { buildQueryFeatures } from './../utils/queryFeatures.js';
 import { generateSlug } from '../utils/slugGenerator.js';
+import { errorResponse, successResponse } from '../utils/apiResponse.js';
 
 // Create New Category
 // POST /api/categories
 
 export const createCategory = asyncHandler(async (req, res) => {
   const missing = requiredInputFields(['name'], req.body);
-
   if (missing.length) {
-    return res.status(400).json({
-      message: `Missing fields: ${missing.join(', ')}`,
-    });
+    return errorResponse(res, 400, `Missing fields: ${missing.join(', ')}`);
   }
 
   const existingCategory = await Category.findOne({
     name: req.body.name.toString().trim(),
   });
   if (existingCategory) {
-    return res.status(409).json({ message: 'Category already exists' });
+    return errorResponse(res, 409, 'Category already exists');
   }
 
   const category = await Category.create({
@@ -28,7 +26,7 @@ export const createCategory = asyncHandler(async (req, res) => {
     slug: generateSlug(req.body.name),
   });
 
-  res.status(201).json(category);
+  return successResponse(res, 201, 'Category created', category);
 });
 
 // Get all categories
@@ -54,7 +52,7 @@ export const getAllCategories = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json({
+  return successResponse(res, 200, 'Categories fetched', {
     total,
     page,
     limit,
@@ -71,17 +69,17 @@ export const getCategoryById = asyncHandler(async (req, res) => {
 
   //Validate ID Format
   if (!isValidObjectId(id)) {
-    return res.status(400).json({ message: 'Invalid category ID' });
+    return errorResponse(res, 400, 'Invalid category ID');
   }
 
   // Fetch the category
   const category = await Category.findById(id);
 
   if (!category) {
-    return res.status(404).json({ message: 'Category not found' });
+    return errorResponse(res, 404, 'Category not found');
   }
 
-  res.status(200).json(category);
+  return successResponse(res, 200, 'Category fetched', category);
 });
 
 // Update category
@@ -93,13 +91,13 @@ export const updateCategory = asyncHandler(async (req, res) => {
 
   // Validate ID Format
   if (!isValidObjectId(id)) {
-    return res.status(400).json({ message: 'Invalid category ID' });
+    return errorResponse(res, 400, 'Invalid category ID');
   }
 
   // Find category
   const category = await Category.findById(id);
   if (!category) {
-    return res.status(404).json({ message: 'Category not found' });
+    return errorResponse(res, 404, 'Category not found');
   }
 
   // Update category fields
@@ -113,7 +111,7 @@ export const updateCategory = asyncHandler(async (req, res) => {
   }
 
   const updatedCategory = await category.save();
-  res.status(200).json(updatedCategory);
+  return successResponse(res, 200, 'Category updated', updatedCategory);
 });
 
 // Delete category
@@ -124,16 +122,16 @@ export const deleteCategory = asyncHandler(async (req, res) => {
 
   // Validate ID Format
   if (!isValidObjectId(id)) {
-    return res.status(400).json({ message: 'Invalid category ID' });
+    return errorResponse(res, 400, 'Invalid category ID');
   }
 
   // Find the category
   const category = await Category.findById(id);
 
   if (!category) {
-    return res.status(404).json({ message: 'Category not found' });
+    return errorResponse(res, 404, 'Category not found');
   }
 
   await category.deleteOne();
-  res.status(200).json({ message: 'Category deleted successfully' });
+  return successResponse(res, 200, 'Category deleted successfully');
 });
