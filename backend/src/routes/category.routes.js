@@ -1,5 +1,6 @@
 import express from 'express';
 import { protect } from '../middlewares/auth.middleware.js';
+import { authorize } from '../middlewares/authorize.middleware.js';
 import {
   createCategory,
   getAllCategories,
@@ -15,8 +16,8 @@ router.get('/', getAllCategories);
 router.get('/:id', getCategoryById);
 
 // Protected routes (admin only creates / updates / deletes category)
-router.post('/', protect, createCategory);
-router.put('/:id', protect, updateCategory);
-router.delete('/:id', protect, deleteCategory);
+router.post('/', protect, authorize("admin"),createCategory);
+router.put('/:id', protect, authorize("admin"), updateCategory);
+router.delete('/:id', protect, authorize("admin"), deleteCategory);
 
 export default router;

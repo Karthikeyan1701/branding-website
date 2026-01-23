@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
 import { buildQueryFeatures } from '../utils/queryFeatures.js';
 import { generateSlug } from '../utils/slugGenerator.js';
+import { errorResponse, successResponse } from '../utils/apiResponse.js';
 
 // Create a subcategory inside a category
 // POST /api/subcategories
@@ -11,24 +12,20 @@ import { generateSlug } from '../utils/slugGenerator.js';
 export const createSubCategory = asyncHandler(async (req, res) => {
   const missing = requiredInputFields(['name', 'categoryId'], req.body);
   if (missing.length) {
-    return res.status(400).json({
-      message: `Missing fields: ${missing.join(', ')}`,
-    });
+    return errorResponse(res, 400, `Missing fields: ${missing.join(', ')}`);
   }
 
   const { name, categoryId } = req.body;
 
   // Validate Category ID format
   if (!isValidObjectId(categoryId)) {
-    return res.status(400).json({
-      message: 'Invalid category ID',
-    });
+    return errorResponse(res, 400, 'Invalid category ID');
   }
 
   // Check if category exists
   const categoryExists = await Category.findById(categoryId);
   if (!categoryExists) {
-    return res.status(404).json({ message: 'Category not found' });
+    return errorResponse(res, 404, 'Category not found');
   }
 
   // Prevent duplicate subcategory within same category
@@ -38,9 +35,11 @@ export const createSubCategory = asyncHandler(async (req, res) => {
   });
 
   if (existingSubCategory) {
-    return res.status(409).json({
-      message: 'Subcategory already exists in this category',
-    });
+    return errorResponse(
+      res,
+      409,
+      'Subcategory already exists in this category',
+    );
   }
 
   // Create a sub category
@@ -50,7 +49,7 @@ export const createSubCategory = asyncHandler(async (req, res) => {
     category: categoryId,
   });
 
-  res.status(201).json(subCategory);
+  return successResponse(res, 201, 'Subcategory created', subCategory);
 });
 
 // Get all the subcategories
@@ -77,7 +76,7 @@ export const getAllSubCategories = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json({
+  return successResponse(res, 200, 'All Subcategories fetched', {
     total,
     page,
     limit,
@@ -95,15 +94,13 @@ export const getSubCategoriesByCategory = asyncHandler(async (req, res) => {
 
   //Validate Category ID Format
   if (!isValidObjectId(categoryId)) {
-    return res.status(400).json({
-      message: 'Invalid category ID',
-    });
+    return errorResponse(res, 400, 'Invalid category ID');
   }
 
   // Check category exists
   const categoryExists = await Category.findById(categoryId);
   if (!categoryExists) {
-    return res.status(404).json({ message: 'Category not found' });
+    return errorResponse(res, 404, 'Category not found');
   }
 
   const filter = { category: categoryId };
@@ -124,7 +121,7 @@ export const getSubCategoriesByCategory = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json({
+  return successResponse(res, 200, 'Subcategory fetched', {
     total,
     page,
     limit,
@@ -142,15 +139,13 @@ export const updateSubCategory = asyncHandler(async (req, res) => {
 
   // Validate ID Format
   if (!isValidObjectId(id)) {
-    return res.status(400).json({ message: 'Invalid subcategory ID' });
+    return errorResponse(res, 400, 'Invalid subcategory ID');
   }
 
   // Find subcategory
   const subCategory = await SubCategory.findById(id);
   if (!subCategory) {
-    return res.status(404).json({
-      message: 'Subcategory not found',
-    });
+    return errorResponse(res, 404, 'Subcategory not found');
   }
 
   // Update fields if provided
@@ -164,7 +159,7 @@ export const updateSubCategory = asyncHandler(async (req, res) => {
   }
 
   const updatedSubCategory = await subCategory.save();
-  res.status(200).json(updatedSubCategory);
+  return successResponse(res, 200, 'Subcategory updated', updatedSubCategory);
 });
 
 // Delete a subcategory
@@ -174,23 +169,17 @@ export const deleteSubCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
-    return res.status(400).json({
-      message: 'Invalid subcategory ID',
-    });
+    return errorResponse(res, 400, 'Invalid subcategory ID');
   }
 
   // Find subcategory
   const subCategory = await SubCategory.findById(id);
 
   if (!subCategory) {
-    return res.status(404).json({
-      message: 'Subcategory not found',
-    });
+    return errorResponse(res, 404, 'Subcategory not found');
   }
 
   await subCategory.deleteOne();
 
-  res.status(200).json({
-    message: 'Subcategory deleted successfully',
-  });
+  return successResponse(res, 200, 'Subcategory deleted successfully');
 });

@@ -5,6 +5,9 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { isValidObjectId, requiredInputFields } from '../utils/validators.js';
 import { buildQueryFeatures } from '../utils/queryFeatures.js';
 import { generateSlug } from '../utils/slugGenerator.js';
+import { successResponse, errorResponse } from '../utils/apiResponse.js';
+
+const isSafeUrl = (url) => url.startsWith('https://');
 
 // Create a product inside a subcategory
 // POST /api/products
@@ -17,34 +20,32 @@ export const createProduct = asyncHandler(async (req, res) => {
 
   const missing = requiredInputFields(
     ['name', 'price', 'categoryId', 'subcategoryId', 'externalUrl'],
-    req.body
+    req.body,
   );
 
   if (missing.length) {
-    return res.status(400).json({
-      message: `Missing fields: ${missing.join(', ')}`,
-    });
+    return errorResponse(res, 400, `Missing fields: ${missing.join(', ')}`);
   }
 
   // Validate ID Formats
   if (!isValidObjectId(categoryId)) {
-    return res.status(400).json({ message: 'Invalid category ID' });
+    return errorResponse(res, 400, 'Invalid category ID');
   }
 
   if (!isValidObjectId(subcategoryId)) {
-    return res.status(400).json({ message: 'Invalid subcategory ID' });
+    return errorResponse(res, 400, 'Invalid subcategory ID');
   }
 
   // Check category exists
   const categoryExists = await Category.findById(categoryId);
   if (!categoryExists) {
-    return res.status(404).json({ message: 'Category not found' });
+    return errorResponse(res, 404, 'Category not found');
   }
 
   // Check subcategory exists
   const subCategoryExists = await SubCategory.findById(subcategoryId);
   if (!subCategoryExists) {
-    return res.status(404).json({ message: 'Subcategory not found' });
+    return errorResponse(res, 404, 'Subcategory not found');
   }
 
   // Prevent duplicate product in same subcategory
@@ -54,9 +55,11 @@ export const createProduct = asyncHandler(async (req, res) => {
   });
 
   if (existingProduct) {
-    return res.status(409).json({
-      message: 'Product already exists in this subcategory',
-    });
+    return errorResponse(
+      res,
+      409,
+      'Product already exists in this subcategory',
+    );
   }
 
   // Create product
@@ -69,7 +72,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     subcategory: subcategoryId,
     externalUrl,
   });
-  res.status(201).json(product);
+  return successResponse(res, 201, 'Product created', product);
 });
 
 // Get all products
@@ -97,7 +100,7 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json({
+  return successResponse(res, 200, 'Products fetched', {
     total,
     page,
     limit,
@@ -114,17 +117,13 @@ export const getProductsBySubCategory = asyncHandler(async (req, res) => {
 
   // Validate ID Format
   if (!isValidObjectId(subcategoryId)) {
-    return res.status(400).json({
-      message: 'Invalid subcategory ID',
-    });
+    return errorResponse(res, 400, 'Invalid subcategory ID');
   }
 
   // Check subcategory exists
   const subCategoryExists = await SubCategory.findById(subcategoryId);
   if (!subCategoryExists) {
-    return res.status(404).json({
-      message: 'Subcategory not found',
-    });
+    return errorResponse(res, 404, 'Subcategory not found');
   }
 
   // Build filter
@@ -147,7 +146,7 @@ export const getProductsBySubCategory = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
 
-  res.status(200).json({
+  return successResponse(res, 200, 'Products fetched', {
     total,
     page,
     limit,
@@ -164,23 +163,17 @@ export const redirectToExternalUrl = asyncHandler(async (req, res) => {
 
   // Validate product ID format
   if (!isValidObjectId(id)) {
-    return res.status(400).json({
-      message: 'Invalid product ID',
-    });
+    return errorResponse(res, 400, 'Invalid product ID');
   }
 
   const product = await Product.findById(id);
 
-  if (!product) {
-    return res.status(404).json({
-      message: 'Product not found',
-    });
+  if (!product || !product.externalUrl) {
+    return errorResponse(res, 404, 'Product not found');
   }
 
-  if (!product.externalUrl) {
-    return res.status(400).json({
-      message: 'External link not available for this product',
-    });
+  if (!isSafeUrl(product.externalUrl)) {
+    return errorResponse(res, 400, 'Unsafe redirect blocked');
   }
 
   // Redirect to trusted external product link
@@ -196,14 +189,12 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   // Validate product ID
   if (!isValidObjectId(id)) {
-    return res.status(400).json({
-      message: 'Invalid product ID',
-    });
+    return errorResponse(res, 400, 'Invalid product ID');
   }
 
   const product = await Product.findById(id);
   if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
+    return errorResponse(res, 404, 'Product not found');
   }
 
   if (name) {
@@ -217,7 +208,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   if (externalUrl) product.externalUrl = externalUrl;
 
   const updatedProduct = await product.save();
-  res.status(200).json(updatedProduct);
+  return successResponse(res, 200, 'Product updated', updatedProduct);
 });
 
 // Delete a product
@@ -228,18 +219,16 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 
   // Validate product ID
   if (!isValidObjectId(id)) {
-    return res.status(400).json({
-      message: 'Invalid product ID',
-    });
+    return errorResponse(res, 400, 'Invalid product ID');
   }
 
   // Delete product
   const product = await Product.findById(id);
 
   if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
+    return errorResponse(res, 404, 'Product not found');
   }
 
   await product.deleteOne();
-  res.status(200).json({ message: 'Product deleted successfully' });
+  return successResponse(res, 200, 'Product deleted successfully');
 });
