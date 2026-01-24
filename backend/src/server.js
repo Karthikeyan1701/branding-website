@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { validatorEnv } from './utils/vadilatorEnv.js';
+import { validatorEnv } from './utils/validatorEnv.js';
 validatorEnv();
 
 import app from './app.js';

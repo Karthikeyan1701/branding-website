@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 import categoryRoutes from './routes/category.routes.js';
 import subCategoryRoutes from './routes/subcategory.routes.js';
@@ -16,6 +17,7 @@ const allowedOrigins = ['http://localhost:4000'];
 
 // Global middlewares
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(
   cors({

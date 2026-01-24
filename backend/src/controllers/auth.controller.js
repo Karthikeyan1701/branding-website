@@ -2,14 +2,7 @@ import Admin from "../models/admin.model.js";
 import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
-
-// Generate JWT
-
-const generateToken = (adminId) => {
-    return jwt.sign({ id: adminId }, process.env.JWT_SECRET, {
-        expiresIn: "1d"
-    });
-};
+import { generateAccessToken, generateRefreshToken } from './../utils/token.js';
 
 // Admin login
 // POST /api/auth/login
@@ -25,20 +18,90 @@ export const loginAdmin = asyncHandler(async (req, res) => {
         // Check admin exists
 
         const admin = await Admin.findOne({ email });
-        if (!admin) {
+        if (!admin || !(await admin.comparePassword(password))) {
             return errorResponse(res, 401, "Invalid email or password");
         }
 
-        // Check password
+        const accessToken = generateAccessToken({
+            id: admin._id,
+            role: admin.role,
+        });
 
-        const isMatch = await admin.comparePassword(password);
-        if (!isMatch) {
-            return errorResponse(res, 401, "Invalid email or password");
+        const refreshToken = generateRefreshToken({
+            id: admin._id,
+        });
+
+        admin.refreshTokens.push({ token: refreshToken });
+        await admin.save();
+
+        res
+            .cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return successResponse(res, 200, "Login successful", { accessToken });
+});
+
+// REFRESH ACCESS TOKEN
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return errorResponse(res, 401, "Refresh token missing");
+    }
+
+    const decoded = jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET
+    );
+
+    const admin = await Admin.findById(decoded.id);
+    if (!admin) {
+        return errorResponse(res, 401, "Invalid refresh token");
+    }
+
+    const exists = admin.refreshTokens.some(
+        (t) => t.token === refreshToken
+    );
+
+    if (!exists) {
+        return errorResponse(res, 401, "Refresh token revoked");
+    }
+
+    return successResponse(res, 200, "Access token refreshed", {
+        accessToken: newAccessToken,
+    });
+});
+
+// LOG OUT
+
+export const logoutAdmin = asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (refreshToken) {
+        const admin = await Admin.findOne({
+            "refreshTokens.token": refreshToken,
+        });
+
+        if (admin) {
+            admin.refreshTokens = admin.refreshTokens.filter(
+                (t) => t.token !== refreshToken
+            );
+            await admin.save();
         }
+    }
 
-        // Generate token
+    res.clearCookie("refreshToken");
 
-        const token = generateToken(admin._id);
+    return successResponse(res, 200, "Logged out successfully");
+});
 
-        return successResponse(res, 200, "Login successful", { token });
+// CURRENT ADMIN
+
+export const getCurrentAdmin = asyncHandler(async (req, res) => {
+    return successResponse(res, 200, "Admin fetched successfully", req.user);
 });
