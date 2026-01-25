@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { logger } from './utils/logger.js';
 import { validatorEnv } from './utils/validatorEnv.js';
 validatorEnv();
 
@@ -14,7 +15,7 @@ const startServer = async () => {
   await connectDB();
 
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
   });
 };
 

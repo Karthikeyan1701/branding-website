@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import { logger } from "../utils/logger.js";
 import Admin from "../models/admin.model.js";
 
 dotenv.config();
@@ -13,7 +14,7 @@ const seedAdmin = async () => {
         });
 
         if (existingAdmin) {
-            console.log("Admin already exists");
+            logger.warn("Admin already exists");
             process.exit(0);
         }
 
@@ -24,10 +25,10 @@ const seedAdmin = async () => {
             role: "admin",
         });
 
-        console.log("Admin user created successfully");
+        logger.info("Admin user created successfully");
         process.exit(0);
     } catch (error) {
-        console.error(error);
+        logger.error({ err: error }, "Admin seeding failed");
         process.exit(1);
     }
 };
