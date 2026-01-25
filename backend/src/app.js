@@ -10,6 +10,10 @@ import authRoutes from './routes/auth.routes.js';
 
 import { errorHandler } from './middlewares/error.middleware.js';
 import { generalRateLimiter } from './middlewares/rateLimiter.middleware.js';
+import { requestLogger } from './middlewares/requestLogger.middleware.js';
+
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from './docs/swagger.js';
 
 const app = express();
 
@@ -38,6 +42,10 @@ app.use(
     crossOriginEmbedderPolicy: false,
   }),
 );
+
+app.use(requestLogger);
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Global API Rate Limiter
 app.use('/api', generalRateLimiter);

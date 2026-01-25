@@ -1,40 +1,42 @@
 Branding Website - Back End Features:
-    -> Express Server & MongoDB Setup ✅
-    -> Environment variable based configuration ✅
-    -> REST API Architecture
-        Category CRUD Operations ✅
-        Subcategory CRUD Operations ✅
-        Product CRUD Operations ✅
-    -> JWT Auth for Admin route protection ✅
-    -> Basic Role Based Access ✅
-    -> Input Validation ✅
-    -> Centralized error handling ✅
-    -> Data & API Quality (Pagination, Filter and Sort) ✅
-    -> Slug Generation ✅
-    -> External product redirection ✅
-    -> Postman Manual API Testing
-    -> Back End Automation Testing
-    -> Logging & Monitoring
-    -> Security Hardening
-    -> Documentation work
+-> Express Server & MongoDB Setup ✅
+-> Environment variable based configuration ✅
+-> REST API Architecture
+    -> Category CRUD Operations ✅
+    -> Subcategory CRUD Operations ✅
+    -> Product CRUD Operations ✅
+-> Basic JWT Auth for Admin route protection ✅
+-> Basic Role Based Access ✅
+-> Centralized error handling ✅
+-> Data & API Quality (Pagination, Filter and Sort) ✅
+-> Slug Generation ✅
+-> External product redirection ✅
+-> Security Hardening ✅
+-> Authentication Maturity ✅
+-> Validation & Data Safety ✅
+-> Logging & Monitoring ✅
+-> API Documentation Work ✅
+-> Postman Manual API Testing
+-> Back End Automation Testing
+-> Backend production readiness & final improvements
 
-Category URL:
-    1. POST http://localhost:4000/api/categories
-    2. GET http://localhost:4000/api/categories
-    3. GET http://localhost:4000/api/categories/:id
-    4. PUT http://localhost:4000/api/categories/:id
+Category URL: 
+    1. POST http://localhost:4000/api/categories 
+    2. GET http://localhost:4000/api/categories 
+    3. GET http://localhost:4000/api/categories/:id 
+    4. PUT http://localhost:4000/api/categories/:id 
     5. DELETE http://localhost:4000/api/categories/:id
 
-Subcategory URL:
-    1. POST http://localhost:4000/api/subcategories
-    2. GET http://localhost:4000/api/subcategories
-    3. GET http://localhost:4000/api/subcategories/category/:categoryid
-    4. PUT http://localhost:4000/api/subcategories/:id
+Subcategory URL: 
+    1. POST http://localhost:4000/api/subcategories 
+    2. GET http://localhost:4000/api/subcategories 
+    3. GET http://localhost:4000/api/subcategories/category/:categoryId 
+    4. PUT http://localhost:4000/api/subcategories/:id 
     5. DELETE http://localhost:4000/api/subcategories/:id
 
-Product URL:
-    1. POST http://localhost:4000/api/products
-    2. GET http://localhost:4000/api/products
-    3. GET http://localhost:4000/api/products/subcategory/:subcategoryid
-    4. PUT http://localhost:4000/api/products/:id
-    5. DELETE http://localhost:4000/api/products/:id
+Product URL: 
+   1. POST http://localhost:4000/api/products 
+   2. GET http://localhost:4000/api/products 
+   3. GET http://localhost:4000/api/products/subcategory/:subcategoryid 
+   4. PUT http://localhost:4000/api/products/:id 
+   5. DELETE http://localhost:4000/api/products/:id
