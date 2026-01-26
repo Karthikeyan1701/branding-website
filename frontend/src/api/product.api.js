@@ -1,4 +1,4 @@
-import api from './axios';
+import api from './axios.js';
 
 export const getProducts = () => {
     return api.get('/products');
@@ -13,7 +13,7 @@ export const createProduct = (data) => {
 };
 
 export const updateProduct = (id, data) => {
-    return api.put(`products/${id}`, data);
+    return api.put(`/products/${id}`, data);
 };
 
 export const deleteProduct = (id) => {

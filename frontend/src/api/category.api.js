@@ -1,4 +1,4 @@
-import api from './axios';
+import api from './axios.js';
 
 export const getCategories = () => {
     return api.get('/categories');
@@ -17,5 +17,5 @@ export const updateCategory = (id, data) => {
 };
 
 export const deleteCategory = (id) => {
-    return api.delete(`categories/${id}`);
+    return api.delete(`/categories/${id}`);
 };

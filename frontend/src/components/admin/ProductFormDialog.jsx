@@ -80,7 +80,7 @@ export default function ProductFormDialog({
       if (editData) {
         await updateProduct(editData._id, payload);
       } else {
-        await createProduct('/products', payload);
+        await createProduct(payload);
       }
 
       onSuccess();

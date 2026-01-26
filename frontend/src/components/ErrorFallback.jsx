@@ -6,7 +6,9 @@ export default function ErrorFallback({ error, resetErrorBoundary }) {
           Something went wrong
         </h1>
 
-        <p className="text-sm text-gray-600">{error.message}</p>
+        <p className="text-sm text-gray-600">
+          {error?.message || "Unexpected error occurred"}
+        </p>
 
         <button
           onClick={resetErrorBoundary}
