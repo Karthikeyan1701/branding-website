@@ -14,13 +14,17 @@ export default function AdminLayout() {
   return (
     <div className="min-h-screen flex bg-white">
       {/* Mobile overlay */}
-      {open && <div className="fixed inset-0 bg-black/40 z-40 md:hidden" />}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
         className={`
-            fixed z-50 md:static inset-y-0 left-0 w-64 bg-white border-r transform transition-transform 
-            ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
+            fixed z-50 md:static w-64 bg-white border-r ${open ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
         `}
       >
         <div className="p-4 space-y-6">
@@ -55,7 +59,11 @@ export default function AdminLayout() {
       <div className="flex-1 flex flex-col">
         {/* Mobile header */}
         <div className="md:hidden border-b px-4 py-3 flex items-center gap-3">
-          <button onClick={() => setOpen(true)} className="p-2 rounded hover:bg-gray-100" aria-label="Open sidebar">
+          <button
+            onClick={() => setOpen(true)}
+            className="p-2 rounded hover:bg-gray-100"
+            aria-label="Open sidebar"
+          >
             <Menu size={20} />
           </button>
           <span className="font-medium">Admin Panel</span>

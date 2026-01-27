@@ -1,6 +1,9 @@
-import { useReducer, useEffect, useCallback } from 'react';
+import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { deleteCategory, getCategories } from '../api/category.api';
-import { deleteSubcategory, getSubcategoriesByCategory } from '../api/subcategory.api';
+import {
+  deleteSubcategory,
+  getSubcategoriesByCategory,
+} from '../api/subcategory.api';
 import { deleteProduct, getProductsBySubcategory } from '../api/product.api';
 
 const initialState = {
@@ -128,8 +131,16 @@ function dataReducer(state, action) {
 export default function useDashboardData() {
   const [state, dispatch] = useReducer(dataReducer, initialState);
 
-  const { categories, subcategories, products, loading, successMsg, errorMsg } =
-    state;
+  const activeCategoryId = useRef(null);
+  const activeSubcategoryId = useRef(null);
+
+  const setSuccess = (msg) => dispatch({
+    type: ACTIONS.SET_SUCCESS, payload: msg
+  });
+
+  const setError = (msg) => dispatch({
+    type: ACTIONS.SET_ERROR, payload: msg
+  });
 
   const fetchCategories = useCallback(async () => {
     dispatch({ type: ACTIONS.FETCH_CATEGORIES_START });
@@ -148,6 +159,7 @@ export default function useDashboardData() {
   }, []);
 
   const fetchSubcategories = useCallback(async (categoryId) => {
+    activeCategoryId.current = categoryId;
     dispatch({ type: ACTIONS.FETCH_SUBCATEGORIES_START });
     try {
       const res = await getSubcategoriesByCategory(categoryId);
@@ -164,6 +176,7 @@ export default function useDashboardData() {
   }, []);
 
   const fetchProducts = useCallback(async (subcategoryId) => {
+    activeSubcategoryId.current = subcategoryId;
     dispatch({ type: ACTIONS.FETCH_PRODUCTS_START });
     try {
       const res = await getProductsBySubcategory(subcategoryId);
@@ -183,85 +196,65 @@ export default function useDashboardData() {
     fetchCategories();
   }, [fetchCategories]);
 
-  const showSuccessMsg = (msg) => {
-    dispatch({ type: ACTIONS.SET_SUCCESS, payload: msg });
-  };
-
-  const showErrorMsg = (msg) => {
-    dispatch({ type: ACTIONS.SET_ERROR, payload: msg });
-  };
-
   useEffect(() => {
-    if (!successMsg && !errorMsg) return;
-
-    const timer = setTimeout(() => {
-      dispatch({ type: ACTIONS.CLEAR_MESSAGES });
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [successMsg, errorMsg]);
+    if  (state.successMsg || state.errorMsg) {
+      const timer = setTimeout(
+        () => dispatch({
+          type: ACTIONS.CLEAR_MESSAGES
+        }),
+        3000
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [state.successMsg, state.errorMsg]);
 
   const handleDeleteCategory = async (id) => {
-    const confirmDeleteCategory = window.confirm(
-      'Are you sure you want to delete this category?\nThis action cannot be undone.',
-    );
-    if (!confirmDeleteCategory) return;
+    if (!window.confirm('Delete this category?')) return;
 
     try {
       await deleteCategory(id);
+      setSuccess('Category deleted successfully.');
       fetchCategories();
-      showSuccessMsg('Category deleted successfully');
     } catch {
-      showErrorMsg('Unable to delete category. Please try again.');
+      setError('Failed to delete category.');
     }
   };
 
   const handleDeleteSubcategory = async (id) => {
-    const confirmDeleteSubcategory = window.confirm(
-      'Are you sure you want to delete this subcategory?\nThis action cannot be undone.',
-    );
-    if (!confirmDeleteSubcategory) return;
+    if (!window.confirm('Delete this subcategory?')) return;
 
     try {
       await deleteSubcategory(id);
-      fetchSubcategories();
-      showSuccessMsg('Subcategory deleted successfully');
+      setSuccess("Subcategory deleted successfully.");
+      if (activeCategoryId.current) {
+        fetchSubcategories(activeCategoryId.current);
+      }
     } catch {
-      showErrorMsg('Unable to delete subcategory. Please try again.');
+      setError('Failed to delete subcategory.');
     }
   };
 
   const handleDeleteProduct = async (id) => {
-    const confirmDeleteProduct = window.confirm(
-      'Are you sure you want to delete this product?\nThis action cannot be undone.',
-    );
-    if (!confirmDeleteProduct) return;
+    if (!window.confirm('Delete this product?')) return;
 
     try {
       await deleteProduct(id);
-      fetchProducts();
-      showSuccessMsg('Product deleted successfully');
+      setSuccess('Product deleted successfully.');
+      if (activeSubcategoryId.current) {
+        fetchProducts(activeSubcategoryId.current);
+      }
     } catch {
-      showErrorMsg('Unable to delete product. Please try again.');
+      setError('Failed to delete product.');
     }
   };
 
   return {
-    categories,
-    subcategories,
-    products,
-    loading,
-    successMsg,
-    errorMsg,
-
+    ...state,
     fetchCategories,
     fetchSubcategories,
     fetchProducts,
-
     handleDeleteCategory,
     handleDeleteSubcategory,
     handleDeleteProduct,
-
-    showSuccessMsg,
   };
 }
