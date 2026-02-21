@@ -95,7 +95,7 @@ router.post('/refresh', refreshAccessToken);
  *                $ref: '#/components/schemas/UnauthorizedError'
  */
 
-router.post('/logout', logoutAdmin);
+router.post('/logout', protect, logoutAdmin);
 
 /**
  * @swagger

@@ -72,6 +72,11 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         return errorResponse(res, 401, "Refresh token revoked");
     }
 
+    const newAccessToken = generateAccessToken({
+        id: admin._id,
+        role: admin.role
+    });
+
     return successResponse(res, 200, "Access token refreshed", {
         accessToken: newAccessToken,
     });

@@ -31,7 +31,7 @@ export const protect = async (req, res, next) => {
       return next(err);
     }
 
-    req.admin = admin;
+    req.user = admin;
     next();
   } catch (error) {
     const err = new Error('Not authorized, token invalid');
