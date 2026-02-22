@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import Admin from '../models/admin.model.js';
+import { verifyAccessToken } from '../utils/token.js';
 
 // Protect routes
 
@@ -20,7 +21,7 @@ export const protect = async (req, res, next) => {
 
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyAccessToken(token);
 
     // Fetch admin
     const admin = await Admin.findById(decoded.id).select('-password');
@@ -34,8 +35,7 @@ export const protect = async (req, res, next) => {
     req.user = admin;
     next();
   } catch (error) {
-    const err = new Error('Not authorized, token invalid');
-    err.statusCode = 401;
-    next(err);
+    error.statusCode = 401;
+    next(error);
   }
 };

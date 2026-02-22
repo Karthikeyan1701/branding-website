@@ -7,7 +7,7 @@ import { buildQueryFeatures } from '../utils/queryFeatures.js';
 import { generateSlug } from '../utils/slugGenerator.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
-const isSafeUrl = (url) => url.startsWith('https://');
+const isSafeUrl = (url) => new URL(url).protocol === 'https:';
 
 // Create a product inside a subcategory
 // POST /api/products

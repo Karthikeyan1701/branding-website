@@ -9,6 +9,13 @@ export const isValidObjectId = (id) => {
 // Required field validator
 
 export const requiredInputFields = (fields, body) => {
-    const missingFields = fields.filter((f) => !body[f]);
-    return missingFields;
+    return fields.filter((field) => {
+        const value = body[field];
+
+        return (
+            value === undefined ||
+            value === null ||
+            (typeof value === 'string' && value.trim() === '')
+        );
+    });
 };

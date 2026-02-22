@@ -2,7 +2,7 @@ import Admin from "../models/admin.model.js";
 import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
-import { generateAccessToken, generateRefreshToken } from './../utils/token.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from './../utils/token.js';
 
 // Admin login
 // POST /api/auth/login
@@ -54,10 +54,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         return errorResponse(res, 401, "Refresh token missing");
     }
 
-    const decoded = jwt.verify(
-        refreshToken,
-        process.env.JWT_REFRESH_SECRET
-    );
+    const decoded = verifyRefreshToken(refreshToken);
 
     const admin = await Admin.findById(decoded.id);
     if (!admin) {
