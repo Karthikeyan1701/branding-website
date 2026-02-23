@@ -24,7 +24,7 @@ export const protect = async (req, res, next) => {
     const decoded = verifyAccessToken(token);
 
     // Fetch admin
-    const admin = await Admin.findById(decoded.id).select('-password');
+    const admin = await Admin.findById(decoded.id).select('-password').lean();
 
     if (!admin) {
       const err = new Error('Not authorized');

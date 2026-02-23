@@ -45,7 +45,9 @@ app.use(
 
 app.use(requestLogger);
 
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+if (process.env.NODE_ENV !== 'production') {
+  app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
 
 // Global API Rate Limiter
 app.use('/api', generalRateLimiter);

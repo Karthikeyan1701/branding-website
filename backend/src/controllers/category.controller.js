@@ -50,7 +50,8 @@ export const getAllCategories = asyncHandler(async (req, res) => {
   const categories = await Category.find(filter)
     .sort({ [sortBy]: order })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return successResponse(res, 200, 'Categories fetched', {
     total,
@@ -73,7 +74,7 @@ export const getCategoryById = asyncHandler(async (req, res) => {
   }
 
   // Fetch the category
-  const category = await Category.findById(id);
+  const category = await Category.findById(id).lean();
 
   if (!category) {
     return errorResponse(res, 404, 'Category not found');

@@ -37,13 +37,13 @@ export const createProduct = asyncHandler(async (req, res) => {
   }
 
   // Check category exists
-  const categoryExists = await Category.findById(categoryId);
+  const categoryExists = await Category.findById(categoryId).lean();
   if (!categoryExists) {
     return errorResponse(res, 404, 'Category not found');
   }
 
   // Check subcategory exists
-  const subCategoryExists = await SubCategory.findById(subcategoryId);
+  const subCategoryExists = await SubCategory.findById(subcategoryId).lean();
   if (!subCategoryExists) {
     return errorResponse(res, 404, 'Subcategory not found');
   }
@@ -52,7 +52,7 @@ export const createProduct = asyncHandler(async (req, res) => {
   const existingProduct = await Product.findOne({
     name: name.toString().trim(),
     subcategory: subcategoryId,
-  });
+  }).lean();
 
   if (existingProduct) {
     return errorResponse(
@@ -98,7 +98,8 @@ export const getAllProducts = asyncHandler(async (req, res) => {
     .populate('subcategory', 'name slug')
     .sort({ [sortBy]: order })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return successResponse(res, 200, 'Products fetched', {
     total,
@@ -121,7 +122,8 @@ export const getProductsBySubCategory = asyncHandler(async (req, res) => {
   }
 
   // Check subcategory exists
-  const subCategoryExists = await SubCategory.findById(subcategoryId);
+  const subCategoryExists = await SubCategory.findById(subcategoryId).select(_id).lean();
+  
   if (!subCategoryExists) {
     return errorResponse(res, 404, 'Subcategory not found');
   }
@@ -144,7 +146,8 @@ export const getProductsBySubCategory = asyncHandler(async (req, res) => {
     .populate('subcategory', 'name slug')
     .sort({ [sortBy]: order })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return successResponse(res, 200, 'Products fetched', {
     total,
@@ -166,7 +169,7 @@ export const redirectToExternalUrl = asyncHandler(async (req, res) => {
     return errorResponse(res, 400, 'Invalid product ID');
   }
 
-  const product = await Product.findById(id);
+  const product = await Product.findById(id).select('externalUrl').lean();
 
   if (!product || !product.externalUrl) {
     return errorResponse(res, 404, 'Product not found');

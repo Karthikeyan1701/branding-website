@@ -23,7 +23,7 @@ export const createSubCategory = asyncHandler(async (req, res) => {
   }
 
   // Check if category exists
-  const categoryExists = await Category.findById(categoryId);
+  const categoryExists = await Category.findById(categoryId).lean();
   if (!categoryExists) {
     return errorResponse(res, 404, 'Category not found');
   }
@@ -32,7 +32,7 @@ export const createSubCategory = asyncHandler(async (req, res) => {
   const existingSubCategory = await SubCategory.findOne({
     name: name.toString().trim(),
     category: categoryId,
-  });
+  }).lean();
 
   if (existingSubCategory) {
     return errorResponse(
@@ -74,7 +74,8 @@ export const getAllSubCategories = asyncHandler(async (req, res) => {
     .populate('category', 'name slug')
     .sort({ [sortBy]: order })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return successResponse(res, 200, 'All Subcategories fetched', {
     total,
@@ -119,7 +120,8 @@ export const getSubCategoriesByCategory = asyncHandler(async (req, res) => {
     .populate('category', 'name slug')
     .sort({ [sortBy]: order })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return successResponse(res, 200, 'Subcategory fetched', {
     total,
