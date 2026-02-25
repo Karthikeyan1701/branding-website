@@ -8,8 +8,18 @@ const connectDB = async () => {
     logger.info(
       `MongoDB connected: ${conn.connection.host}/${conn.connection.name}`
     );
+
+    // Connection lifecycle monitoring
+    mongoose.connection.on('disconnected', () => {
+      logger.warn('MongoDB disconnected');
+    });
+
+    mongoose.connection.on('reconnected', () => {
+      logger.info('MongoDB reconnected');
+    });
+
   } catch (error) {
-    logger.error(
+    logger.fatal(
       { err: error },
       "MongoDB connection failed:"
     );

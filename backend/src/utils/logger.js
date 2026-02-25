@@ -9,6 +9,9 @@ const level =
 
 export const logger = pino({
     level,
+    base: {
+        service: 'branding-api',
+    },
     transport: isProd
         ? undefined
         : {

@@ -5,16 +5,7 @@ export const errorHandler = (err, req, res, next) => {
   const message = err.message || "Internal Server Error";
 
   // Log error stack only in development
-  if (process.env.NODE_ENV === 'development') {
-    logger.error(
-      {
-        statusCode,
-        path: req.originalUrl,
-        method: req.method,
-      },
-      message
-    );
-  } else {
+  if (process.env.NODE_ENV !== 'production') {
     logger.error(
       {
         statusCode,
@@ -24,12 +15,21 @@ export const errorHandler = (err, req, res, next) => {
       },
       message
     );
+  } else {
+    logger.error(
+      {
+        statusCode,
+        path: req.originalUrl,
+        method: req.method,
+      },
+      message
+    );
   }
 
   return res.status(statusCode).json({
     success: false,
     message,
-    ...err(process.env.NODE_ENV !== "production" && {
+    ...(process.env.NODE_ENV !== "production" && {
       stack: err.stack,
     }),
   });
